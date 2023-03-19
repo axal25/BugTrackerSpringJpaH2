@@ -8,8 +8,8 @@ import java.time.ZoneOffset;
 
 public class LocalDateUtils {
 
-    public static LocalDate produceRandom() {
-        return produceRandom(null, null);
+    public static LocalDate produceRandomPastSinceEpoch() {
+        return produceRandom(LocalDate.EPOCH, LocalDate.now());
     }
 
     public static LocalDate produceRandom(LocalDate min, LocalDate max) {

@@ -39,12 +39,7 @@ public class ReleaseEntityFactory {
 
         ReleaseEntity release = new ReleaseEntity();
         release.setId(releaseId);
-        LocalDate releaseDate = LocalDateUtils.produceRandom();
-        releaseDate = LocalDate.of(
-                Math.abs(releaseDate.getYear() % 10000),
-                releaseDate.getMonth(),
-                releaseDate.getDayOfMonth());
-        release.setReleaseDate(releaseDate);
+        release.setReleaseDate(LocalDateUtils.produceRandomPastSinceEpoch());
         release.setDescription(FieldValueFormatter.getStringValue(
                 ReleaseEntity.class,
                 "name",

@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * JTA = Java Transaction API
  */
-// @Transactional // should not be present
+// @Transactional // should not be present to be non-JTA
 @Repository("nonJta")
 public class TicketNonJtaDao implements ITicketDao {
 
