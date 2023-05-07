@@ -1,13 +1,17 @@
-package axal25.oles.jacek.jdbc;
+package axal25.oles.jacek.jdbc.dao;
 
 import axal25.oles.jacek.entity.ApplicationEntity;
 import axal25.oles.jacek.entity.ReleaseEntity;
 import axal25.oles.jacek.entity.factory.ApplicationEntityFactory;
+import axal25.oles.jacek.entity.factory.EntityFactory;
 import axal25.oles.jacek.entity.factory.ReleaseEntityFactory;
+import axal25.oles.jacek.jdbc.DatabaseUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
@@ -22,27 +26,27 @@ import static com.google.common.truth.Truth.assertThat;
 @SpringBootTest
 public class JdbcApplicationToReleaseDaoTest {
     private static final Random random = new Random();
-
-    private JdbcApplicationToReleaseDao appToReleaseDao;
-    private JdbcApplicationDaoTest appDaoTest;
-    private JdbcReleaseDaoTest releaseDaoTest;
+    private Connection connection;
 
     @BeforeEach
     void setUp() throws SQLException {
-        appToReleaseDao = new JdbcApplicationToReleaseDao();
-        appDaoTest = new JdbcApplicationDaoTest();
-        appDaoTest.setUp();
-        releaseDaoTest = new JdbcReleaseDaoTest();
-        releaseDaoTest.setUp();
+        connection = DatabaseUtils.getConnection();
+    }
+
+    @AfterEach
+    void tearDown() throws SQLException {
+        connection.rollback();
     }
 
     @Test
     public void selectApplicationIdToReleaseIdMap() throws SQLException {
         String methodName = "selectApplicationIdToReleaseIdMap";
 
-        SimpleEntry<ApplicationEntity, ReleaseEntity> insertedAppToRelease = insertApplicationIdToReleaseIdAndAssertAndGet(methodName);
+        SimpleEntry<ApplicationEntity, ReleaseEntity> insertedAppToRelease =
+                insertApplicationIdToReleaseIdAndAssertAndGet(methodName);
 
-        Map<Integer, Integer> selectedApplicationIdToReleaseIdMap = appToReleaseDao.selectApplicationIdToReleaseIdMap();
+        Map<Integer, Integer> selectedApplicationIdToReleaseIdMap =
+                JdbcApplicationToReleaseDao.selectApplicationIdToReleaseIdMap(connection);
 
         assertThat(selectedApplicationIdToReleaseIdMap)
                 .containsAtLeast(insertedAppToRelease.getKey().getId(), insertedAppToRelease.getValue().getId());
@@ -52,9 +56,13 @@ public class JdbcApplicationToReleaseDaoTest {
     public void selectApplicationIdToReleaseIdByApplicationId() throws SQLException {
         String methodName = "selectApplicationIdToReleaseIdByApplicationId";
 
-        SimpleEntry<ApplicationEntity, ReleaseEntity> insertedAppToRelease = insertApplicationIdToReleaseIdAndAssertAndGet(methodName);
+        SimpleEntry<ApplicationEntity, ReleaseEntity> insertedAppToRelease =
+                insertApplicationIdToReleaseIdAndAssertAndGet(methodName);
 
-        Optional<SimpleEntry<Integer, Integer>> applicationIdToReleaseId = appToReleaseDao.selectApplicationIdToReleaseIdByApplicationId(insertedAppToRelease.getKey().getId());
+        Optional<SimpleEntry<Integer, Integer>> applicationIdToReleaseId =
+                JdbcApplicationToReleaseDao.selectApplicationIdToReleaseIdByApplicationId(
+                        insertedAppToRelease.getKey().getId(),
+                        connection);
 
         assertThat(applicationIdToReleaseId).isNotNull();
         assertThat(applicationIdToReleaseId.isPresent()).isTrue();
@@ -68,9 +76,13 @@ public class JdbcApplicationToReleaseDaoTest {
     public void selectApplicationIdToReleaseIdByReleaseId() throws SQLException {
         String methodName = "selectApplicationIdToReleaseIdByReleaseId";
 
-        SimpleEntry<ApplicationEntity, ReleaseEntity> insertedAppToRelease = insertApplicationIdToReleaseIdAndAssertAndGet(methodName);
+        SimpleEntry<ApplicationEntity, ReleaseEntity> insertedAppToRelease =
+                insertApplicationIdToReleaseIdAndAssertAndGet(methodName);
 
-        Optional<SimpleEntry<Integer, Integer>> applicationIdToReleaseId = appToReleaseDao.selectApplicationIdToReleaseIdByReleaseId(insertedAppToRelease.getValue().getId());
+        Optional<SimpleEntry<Integer, Integer>> applicationIdToReleaseId =
+                JdbcApplicationToReleaseDao.selectApplicationIdToReleaseIdByReleaseId(
+                        insertedAppToRelease.getValue().getId(),
+                        connection);
 
         assertThat(applicationIdToReleaseId).isNotNull();
         assertThat(applicationIdToReleaseId.isPresent()).isTrue();
@@ -97,8 +109,12 @@ public class JdbcApplicationToReleaseDaoTest {
                                 SimpleEntry::getKey,
                                 SimpleEntry::getValue));
 
-        Map<Integer, Integer> applicationIdToReleaseIdMap = appToReleaseDao.selectApplicationIdToReleaseIdMapByApplicationIds(
-                insertedAppToReleaseMap.keySet().stream().map(ApplicationEntity::getId).collect(Collectors.toList()));
+        Map<Integer, Integer> applicationIdToReleaseIdMap =
+                JdbcApplicationToReleaseDao.selectApplicationIdToReleaseIdMapByApplicationIds(
+                        insertedAppToReleaseMap.keySet().stream()
+                                .map(ApplicationEntity::getId)
+                                .collect(Collectors.toList()),
+                        connection);
 
         assertThat(applicationIdToReleaseIdMap)
                 .containsExactlyEntriesIn(
@@ -125,8 +141,12 @@ public class JdbcApplicationToReleaseDaoTest {
                                 SimpleEntry::getKey,
                                 SimpleEntry::getValue));
 
-        Map<Integer, Integer> applicationIdToReleaseIdMap = appToReleaseDao.selectApplicationIdToReleaseIdMapByReleaseIds(
-                insertedAppToReleaseMap.values().stream().map(ReleaseEntity::getId).collect(Collectors.toList()));
+        Map<Integer, Integer> applicationIdToReleaseIdMap =
+                JdbcApplicationToReleaseDao.selectApplicationIdToReleaseIdMapByReleaseIds(
+                        insertedAppToReleaseMap.values().stream()
+                                .map(ReleaseEntity::getId)
+                                .collect(Collectors.toList()),
+                        connection);
 
         assertThat(applicationIdToReleaseIdMap)
                 .containsExactlyEntriesIn(
@@ -138,7 +158,8 @@ public class JdbcApplicationToReleaseDaoTest {
 
     @Test
     public void insertApplicationIdToReleaseId_isInsertedSuccessfully() throws SQLException {
-        insertApplicationIdToReleaseIdAndAssertAndGet("insertApplicationIdToReleaseId_isInsertedSuccessfully");
+        insertApplicationIdToReleaseIdAndAssertAndGet(
+                "insertApplicationIdToReleaseId_isInsertedSuccessfully");
     }
 
     private SimpleEntry<ApplicationEntity, ReleaseEntity> insertApplicationIdToReleaseIdAndAssertAndGet(
@@ -146,20 +167,25 @@ public class JdbcApplicationToReleaseDaoTest {
         ApplicationEntity inputApp = ApplicationEntityFactory.produce(
                 methodName,
                 getClass(),
-                JdbcApplicationEntityIdProvider.generateId());
+                null,
+                EntityFactory.IdGenerateMode.FROM_JDBC);
 
         ReleaseEntity inputRelease = ReleaseEntityFactory.produce(
                 methodName,
                 getClass(),
                 null,
-                null);
+                null,
+                EntityFactory.IdGenerateMode.FROM_JDBC);
         inputRelease.setApplications(List.of());
 
-        appDaoTest.insertApplicationAndAssert(inputApp);
-        releaseDaoTest.insertReleaseAndAssert(inputRelease);
+        JdbcApplicationDao.insertApplication(inputApp, connection);
+        JdbcReleaseDao.insertRelease(inputRelease, connection);
 
         Optional<SimpleEntry<Integer, Integer>> insertedAppIdToReleaseId =
-                appToReleaseDao.insertApplicationIdToReleaseId(inputApp.getId(), inputRelease.getId());
+                JdbcApplicationToReleaseDao.insertApplicationIdToReleaseId(
+                        inputApp.getId(),
+                        inputRelease.getId(),
+                        connection);
 
         assertThat(insertedAppIdToReleaseId).isNotNull();
         assertThat(insertedAppIdToReleaseId.isPresent()).isTrue();

@@ -31,8 +31,9 @@ public class TicketJtaDao implements ITicketDao {
     }
 
     @Override
-    public void addTicket(TicketEntity ticket) {
+    public TicketEntity addTicket(TicketEntity ticket) {
         entityManager.persist(ticket);
+        return ticket;
     }
 
     @Override
@@ -52,13 +53,13 @@ public class TicketJtaDao implements ITicketDao {
     }
 
     @Override
-    public void closeTicket(int ticketId) {
+    public void closeTicketById(int ticketId) {
         TicketEntity ticket = getTicketById(ticketId);
         ticket.setStatus("Resolved");
     }
 
     @Override
-    public void deleteTicket(int ticketId) {
+    public void deleteTicketById(int ticketId) {
         entityManager.remove(ticketId);
     }
 }

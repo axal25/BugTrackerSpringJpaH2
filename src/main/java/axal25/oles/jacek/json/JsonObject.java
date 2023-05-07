@@ -9,6 +9,7 @@ public interface JsonObject {
             return JsonProvider.getObjectMapper()
                     .writeValueAsString(this);
         } catch (JsonProcessingException e) {
+            System.err.println("Couldn't produce Json for object: " + this);
             throw new RuntimeException(e);
         }
     }
@@ -19,6 +20,7 @@ public interface JsonObject {
                     .writer(JsonProvider.writerWithSpaces())
                     .writeValueAsString(this);
         } catch (JsonProcessingException e) {
+            System.err.println("Couldn't produce Json for object: " + this);
             throw new RuntimeException(e);
         }
     }
@@ -27,6 +29,7 @@ public interface JsonObject {
         try {
             return JsonProvider.getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
         } catch (JsonProcessingException e) {
+            System.err.println("Couldn't produce Json for object: " + this);
             throw new RuntimeException(e);
         }
     }

@@ -7,13 +7,13 @@ import java.util.List;
 public interface ITicketDao {
     List<TicketEntity> getAllTickets();
 
-    void addTicket(TicketEntity ticket);
+    TicketEntity addTicket(TicketEntity ticket);
 
     TicketEntity getTicketById(int ticketId);
 
     void updateTicket(TicketEntity ticket);
 
-    void closeTicket(int ticketId);
+    void closeTicketById(int ticketId);
 
-    void deleteTicket(int ticketId);
+    void deleteTicketById(int ticketId);
 }

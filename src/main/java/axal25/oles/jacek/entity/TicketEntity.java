@@ -15,7 +15,7 @@ import javax.persistence.*;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = Constants.Tables.TICKETS)
-public class TicketEntity implements JsonObject {
+public class TicketEntity implements JsonObject, ComparableFullyFetchedEntity<TicketEntity> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -36,4 +36,31 @@ public class TicketEntity implements JsonObject {
             joinColumns = @JoinColumn(name = Constants.Tables.ReleasesToTickets.TICKET_ID),
             inverseJoinColumns = @JoinColumn(name = Constants.Tables.ReleasesToTickets.RELEASE_ID))
     private ReleaseEntity release;
+
+    @Override
+    public TicketEntity toComparableFullyFetchedEntity() {
+        return deepCopy();
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            return deepCopy();
+        }
+    }
+
+    public TicketEntity deepCopy() {
+        TicketEntity comparableTicket = new TicketEntity();
+
+        comparableTicket.setId(getId());
+        comparableTicket.setTitle(getTitle());
+        comparableTicket.setStatus(getStatus());
+        comparableTicket.setDescription(getDescription());
+        comparableTicket.setApplication(getApplication().deepCopy());
+        comparableTicket.setRelease(getRelease().deepCopy());
+
+        return comparableTicket;
+    }
 }

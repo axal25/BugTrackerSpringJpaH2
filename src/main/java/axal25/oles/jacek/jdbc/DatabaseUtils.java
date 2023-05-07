@@ -12,6 +12,8 @@ public class DatabaseUtils {
         Properties properties = new Properties();
         properties.put("user", Constants.Database.userName);
         properties.put("password", Constants.Database.password);
-        return DriverManager.getConnection("jdbc:h2:mem:" + Constants.Database.databaseName, properties);
+        Connection connection = DriverManager.getConnection("jdbc:h2:mem:" + Constants.Database.databaseName, properties);
+        connection.setAutoCommit(false);
+        return connection;
     }
 }

@@ -1,10 +1,10 @@
-package axal25.oles.jacek.jdbc;
+package axal25.oles.jacek.jdbc.id.provider;
 
-import axal25.oles.jacek.entity.TicketEntity;
+import axal25.oles.jacek.jdbc.DatabaseUtils;
+import axal25.oles.jacek.jdbc.dao.JdbcTicketDao;
 
 import java.sql.SQLException;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class JdbcTicketEntityIdProvider extends JdbcAbstractEntityIdProvider {
 
@@ -18,14 +18,14 @@ public class JdbcTicketEntityIdProvider extends JdbcAbstractEntityIdProvider {
             singleton = new JdbcTicketEntityIdProvider();
         }
 
-        return singleton.generatedId();
+        return singleton.instanceGenerateId();
     }
 
     @Override
     protected Set<Integer> fetchIds() throws SQLException {
-        return new JdbcTicketDao()
-                .selectTickets().stream()
-                .map(TicketEntity::getId)
-                .collect(Collectors.toSet());
+        return Set.copyOf(
+                JdbcTicketDao
+                        .selectTicketIds(
+                                DatabaseUtils.getConnection()));
     }
 }

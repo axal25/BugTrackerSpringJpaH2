@@ -1,6 +1,4 @@
-package axal25.oles.jacek.util.localdate;
-
-import axal25.oles.jacek.util.instant.InstantUtils;
+package axal25.oles.jacek.util;
 
 import java.time.LocalDate;
 import java.time.ZoneId;

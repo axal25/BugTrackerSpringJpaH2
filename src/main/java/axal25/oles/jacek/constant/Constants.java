@@ -5,6 +5,11 @@ import java.util.List;
 
 public class Constants {
 
+    public static class OrderBy {
+        public final static String ASC = "ASC";
+        public final static String DESC = "DESC";
+    }
+
     public static class EndpointPaths {
 
         public static final String BUG_TRACKER_CONTROLLER = "/bug-tracker";
@@ -24,7 +29,7 @@ public class Constants {
             public static final String NAME = "app_name";
             public static final String DESCRIPTION = "description";
             public static final String OWNER = "owner";
-            public static final List<String> COLUMNS = List.of(ID, NAME, DESCRIPTION, OWNER);
+            public static final String ORDER_BY = Constants.Tables.Applications.ID + " " + Constants.OrderBy.ASC;
         }
 
         public static final String RELEASES = "releases";

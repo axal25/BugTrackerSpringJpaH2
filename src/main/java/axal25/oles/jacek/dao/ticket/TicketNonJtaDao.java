@@ -32,8 +32,18 @@ public class TicketNonJtaDao implements ITicketDao {
     }
 
     @Override
-    public void addTicket(TicketEntity ticket) {
+    public TicketEntity addTicket(TicketEntity ticket) {
+        EntityTransaction entityTransaction = entityManager.getTransaction();
+        entityTransaction.begin();
+        try {
+            entityManager.persist(ticket);
+            entityTransaction.commit();
+        } catch (Exception e) {
+            entityTransaction.rollback();
+            throw e;
+        }
 
+        return ticket;
     }
 
     @Override
@@ -62,12 +72,12 @@ public class TicketNonJtaDao implements ITicketDao {
     }
 
     @Override
-    public void closeTicket(int ticketId) {
+    public void closeTicketById(int ticketId) {
 
     }
 
     @Override
-    public void deleteTicket(int ticketId) {
+    public void deleteTicketById(int ticketId) {
 
     }
 }

@@ -1,6 +1,4 @@
-package axal25.oles.jacek.util.instant;
-
-import axal25.oles.jacek.util.biginteger.BigIntegerUtils;
+package axal25.oles.jacek.util;
 
 import java.time.Instant;
 import java.util.Random;

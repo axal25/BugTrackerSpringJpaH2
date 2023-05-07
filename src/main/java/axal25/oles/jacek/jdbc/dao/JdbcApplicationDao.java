@@ -1,4 +1,4 @@
-package axal25.oles.jacek.jdbc;
+package axal25.oles.jacek.jdbc.dao;
 
 import axal25.oles.jacek.constant.Constants;
 import axal25.oles.jacek.entity.ApplicationEntity;
@@ -15,12 +15,35 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class JdbcApplicationDao {
-    private final Connection connection = DatabaseUtils.getConnection();
-
-    public JdbcApplicationDao() throws SQLException {
+    private JdbcApplicationDao() {
     }
 
-    public List<ApplicationEntity> selectApplications() throws SQLException {
+    public static Optional<ApplicationEntity> insertApplication(ApplicationEntity application, Connection connection) throws SQLException {
+
+        String insert = String.format(
+                "INSERT INTO %s (%s) VALUES (%s)",
+                Constants.Tables.APPLICATIONS,
+                String.format("%s, %s, %s, %s",
+                        Constants.Tables.Applications.ID,
+                        Constants.Tables.Applications.NAME,
+                        Constants.Tables.Applications.DESCRIPTION,
+                        Constants.Tables.Applications.OWNER),
+                "?1, ?2, ?3, ?4");
+
+        PreparedStatement preparedStatement = connection.prepareStatement(insert);
+        preparedStatement.setInt(1, application.getId());
+        preparedStatement.setString(2, application.getName());
+        preparedStatement.setString(3, application.getDescription());
+        preparedStatement.setString(4, application.getOwner());
+
+        if (preparedStatement.executeUpdate() == 1) {
+            return Optional.of(application);
+        }
+
+        return Optional.empty();
+    }
+
+    public static List<ApplicationEntity> selectApplications(Connection connection) throws SQLException {
         String select = "SELECT * FROM " + Constants.Tables.APPLICATIONS;
         ResultSet resultSet = connection.createStatement().executeQuery(select);
 
@@ -33,23 +56,26 @@ public class JdbcApplicationDao {
             application.setOwner(resultSet.getString(Constants.Tables.Applications.OWNER));
             applications.add(application);
         }
+
         return applications;
     }
 
-    public List<Integer> selectApplicationIds() throws SQLException {
+    public static List<Integer> selectApplicationIds(Connection connection) throws SQLException {
         String select = "SELECT " + Constants.Tables.Applications.ID + " FROM " + Constants.Tables.APPLICATIONS;
         ResultSet resultSet = connection.createStatement().executeQuery(select);
 
         List<Integer> applicationIds = new ArrayList<>();
+
         while (resultSet.next()) {
             applicationIds.add(resultSet.getInt(Constants.Tables.Applications.ID));
         }
+
         return applicationIds;
     }
 
-    public Optional<ApplicationEntity> selectApplicationById(Integer id) throws SQLException {
+    public static Optional<ApplicationEntity> selectApplicationById(Integer id, Connection connection) throws SQLException {
         if (id == null) {
-            throw new SQLException(ApplicationEntity.class.getSimpleName() + "'s id cannot be null");
+            throw new IllegalArgumentException(ApplicationEntity.class.getSimpleName() + "'s id cannot be null.");
         }
 
         String select = "SELECT * FROM " + Constants.Tables.APPLICATIONS + " WHERE " + Constants.Tables.Applications.ID + " = ?1";
@@ -70,9 +96,9 @@ public class JdbcApplicationDao {
         return Optional.empty();
     }
 
-    public List<ApplicationEntity> selectApplicationsByIds(List<Integer> ids) throws SQLException {
+    public static List<ApplicationEntity> selectApplicationsByIds(List<Integer> ids, Connection connection) throws SQLException {
         if (ids == null || ids.stream().anyMatch(Objects::isNull)) {
-            throw new SQLException(ApplicationEntity.class.getSimpleName() + "'s ids cannot be null");
+            throw new IllegalArgumentException(ApplicationEntity.class.getSimpleName() + "'s ids cannot be null");
         }
 
         if (ids.isEmpty()) {
@@ -103,30 +129,7 @@ public class JdbcApplicationDao {
             application.setOwner(resultSet.getString(Constants.Tables.Applications.OWNER));
             applications.add(application);
         }
+
         return applications;
-    }
-
-    public Optional<ApplicationEntity> insertApplication(ApplicationEntity application) throws SQLException {
-        String insert = String.format(
-                "INSERT INTO %s (%s) VALUES (%s)",
-                Constants.Tables.APPLICATIONS,
-                String.format("%s, %s, %s, %s",
-                        Constants.Tables.Applications.ID,
-                        Constants.Tables.Applications.NAME,
-                        Constants.Tables.Applications.DESCRIPTION,
-                        Constants.Tables.Applications.OWNER),
-                "?1, ?2, ?3, ?4");
-
-        PreparedStatement preparedStatement = connection.prepareStatement(insert);
-        preparedStatement.setInt(1, application.getId());
-        preparedStatement.setString(2, application.getName());
-        preparedStatement.setString(3, application.getDescription());
-        preparedStatement.setString(4, application.getOwner());
-
-        if (preparedStatement.executeUpdate() == 1) {
-            return Optional.of(application);
-        }
-
-        return Optional.empty();
     }
 }

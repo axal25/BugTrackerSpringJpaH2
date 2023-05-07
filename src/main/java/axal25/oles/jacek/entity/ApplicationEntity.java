@@ -15,7 +15,7 @@ import javax.persistence.*;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = Constants.Tables.APPLICATIONS)
-public class ApplicationEntity implements JsonObject {
+public class ApplicationEntity implements JsonObject, Cloneable, ComparableFullyFetchedEntity<ApplicationEntity> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = Constants.Tables.Applications.ID)
@@ -28,6 +28,31 @@ public class ApplicationEntity implements JsonObject {
     private String description;
 
     private String owner;
+
+    @Override
+    public ApplicationEntity toComparableFullyFetchedEntity() {
+        return deepCopy();
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            return deepCopy();
+        }
+    }
+
+    public ApplicationEntity deepCopy() {
+        ApplicationEntity comparableApp = new ApplicationEntity();
+
+        comparableApp.setId(getId());
+        comparableApp.setName(getName());
+        comparableApp.setDescription(getDescription());
+        comparableApp.setOwner(getOwner());
+
+        return comparableApp;
+    }
 
 //    @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = true)
 //    @JoinTable(

@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Repository("SpringCrudRepository")
-public interface TicketCrudRepository extends CrudRepository<TicketEntity, Integer>, ITicketDao {
+public interface TicketSpringCrudRepository extends CrudRepository<TicketEntity, Integer>, ITicketDao {
 
     @Override
     default List<TicketEntity> getAllTickets() {
@@ -18,8 +18,8 @@ public interface TicketCrudRepository extends CrudRepository<TicketEntity, Integ
     }
 
     @Override
-    default void addTicket(TicketEntity ticket) {
-        save(ticket);
+    default TicketEntity addTicket(TicketEntity ticket) {
+        return save(ticket);
     }
 
     @Override
@@ -33,12 +33,12 @@ public interface TicketCrudRepository extends CrudRepository<TicketEntity, Integ
     }
 
     @Override
-    default void closeTicket(int ticketId) {
+    default void closeTicketById(int ticketId) {
 
     }
 
     @Override
-    default void deleteTicket(int ticketId) {
+    default void deleteTicketById(int ticketId) {
         deleteById(ticketId);
     }
 }

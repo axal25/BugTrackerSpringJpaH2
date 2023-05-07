@@ -1,11 +1,15 @@
-package axal25.oles.jacek.jdbc;
+package axal25.oles.jacek.jdbc.dao;
 
 import axal25.oles.jacek.entity.ApplicationEntity;
 import axal25.oles.jacek.entity.factory.ApplicationEntityFactory;
+import axal25.oles.jacek.entity.factory.EntityFactory;
+import axal25.oles.jacek.jdbc.DatabaseUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -17,13 +21,17 @@ import static com.google.common.truth.Truth.assertThat;
 
 @SpringBootTest
 public class JdbcApplicationDaoTest {
-
     private static final Random random = new Random();
-    private JdbcApplicationDao appDao;
+    private Connection connection;
 
     @BeforeEach
     void setUp() throws SQLException {
-        appDao = new JdbcApplicationDao();
+        connection = DatabaseUtils.getConnection();
+    }
+
+    @AfterEach
+    void tearDown() throws SQLException {
+        connection.rollback();
     }
 
     @Test
@@ -31,11 +39,12 @@ public class JdbcApplicationDaoTest {
         ApplicationEntity inputApp = ApplicationEntityFactory.produce(
                 "selectApplications",
                 getClass(),
-                JdbcApplicationEntityIdProvider.generateId());
+                null,
+                EntityFactory.IdGenerateMode.FROM_JDBC);
 
         insertApplicationAndAssert(inputApp);
 
-        List<ApplicationEntity> selecteds = appDao.selectApplications();
+        List<ApplicationEntity> selecteds = JdbcApplicationDao.selectApplications(connection);
 
         assertThat(selecteds).containsAtLeastElementsIn(List.of(inputApp));
     }
@@ -45,11 +54,12 @@ public class JdbcApplicationDaoTest {
         ApplicationEntity inputApp = ApplicationEntityFactory.produce(
                 "selectApplicationIds",
                 getClass(),
-                JdbcApplicationEntityIdProvider.generateId());
+                null,
+                EntityFactory.IdGenerateMode.FROM_JDBC);
 
         insertApplicationAndAssert(inputApp);
 
-        List<Integer> selecteds = appDao.selectApplicationIds();
+        List<Integer> selecteds = JdbcApplicationDao.selectApplicationIds(connection);
 
         assertThat(selecteds).containsAtLeastElementsIn(List.of(inputApp.getId()));
     }
@@ -59,11 +69,12 @@ public class JdbcApplicationDaoTest {
         ApplicationEntity inputApp = ApplicationEntityFactory.produce(
                 "selectApplicationById",
                 getClass(),
-                JdbcApplicationEntityIdProvider.generateId());
+                null,
+                EntityFactory.IdGenerateMode.FROM_JDBC);
 
         insertApplicationAndAssert(inputApp);
 
-        Optional<ApplicationEntity> selected = appDao.selectApplicationById(inputApp.getId());
+        Optional<ApplicationEntity> selected = JdbcApplicationDao.selectApplicationById(inputApp.getId(), connection);
 
         assertThat(selected).isNotNull();
         assertThat(selected.isPresent()).isTrue();
@@ -76,7 +87,8 @@ public class JdbcApplicationDaoTest {
                 .mapToObj(unused -> ApplicationEntityFactory.produce(
                         "selectApplicationsByIds",
                         getClass(),
-                        JdbcApplicationEntityIdProvider.generateId()))
+                        null,
+                        EntityFactory.IdGenerateMode.FROM_JDBC))
                 .collect(Collectors.toList());
 
         inputApps.forEach(inputApp -> {
@@ -87,8 +99,9 @@ public class JdbcApplicationDaoTest {
             }
         });
 
-        List<ApplicationEntity> selecteds = appDao.selectApplicationsByIds(
-                inputApps.stream().map(ApplicationEntity::getId).collect(Collectors.toList()));
+        List<ApplicationEntity> selecteds = JdbcApplicationDao.selectApplicationsByIds(
+                inputApps.stream().map(ApplicationEntity::getId).collect(Collectors.toList()),
+                connection);
 
         assertThat(selecteds).containsExactlyElementsIn(inputApps);
     }
@@ -98,13 +111,14 @@ public class JdbcApplicationDaoTest {
         ApplicationEntity inputApp = ApplicationEntityFactory.produce(
                 "insertApplication_isInsertedSuccessfully",
                 getClass(),
-                JdbcApplicationEntityIdProvider.generateId());
+                null,
+                EntityFactory.IdGenerateMode.FROM_JDBC);
 
         insertApplicationAndAssert(inputApp);
     }
 
-    public void insertApplicationAndAssert(ApplicationEntity inputApp) throws SQLException {
-        Optional<ApplicationEntity> inserted = appDao.insertApplication(inputApp);
+    private void insertApplicationAndAssert(ApplicationEntity inputApp) throws SQLException {
+        Optional<ApplicationEntity> inserted = JdbcApplicationDao.insertApplication(inputApp, connection);
 
         assertThat(inserted).isNotNull();
         assertThat(inserted.isPresent()).isTrue();

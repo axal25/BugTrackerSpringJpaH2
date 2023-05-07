@@ -39,11 +39,11 @@ public class TicketService implements ITicketService {
 
     @Override
     public void closeTicket(int ticketId) {
-        ticketDao.closeTicket(ticketId);
+        ticketDao.closeTicketById(ticketId);
     }
 
     @Override
     public void deleteTicket(int ticketId) {
-        ticketDao.deleteTicket(ticketId);
+        ticketDao.deleteTicketById(ticketId);
     }
 }

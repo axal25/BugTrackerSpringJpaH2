@@ -12,6 +12,7 @@ public class JsonProvider {
 
     public static ObjectMapper getObjectMapper() {
         return new ObjectMapper()
+                .findAndRegisterModules()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, true)
                 .configure(DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS, false);

@@ -6,18 +6,7 @@ import axal25.oles.jacek.entity.TicketEntity;
 
 public class FieldValueFormatter {
 
-    private final String entityObjectName;
-
-    public FieldValueFormatter(Class<?> entityClass) {
-        entityObjectName = getEntityObjectName(entityClass);
-    }
-
-    public String getStringValue(String fieldName, String methodName, Integer id) {
-        return getStringValue(
-                entityObjectName,
-                fieldName,
-                methodName,
-                id);
+    private FieldValueFormatter() {
     }
 
     public static String getStringValue(Class<?> entityClass, String fieldName, String methodName, Integer id) {

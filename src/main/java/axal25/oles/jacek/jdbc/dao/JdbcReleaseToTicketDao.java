@@ -1,4 +1,4 @@
-package axal25.oles.jacek.jdbc;
+package axal25.oles.jacek.jdbc.dao;
 
 import axal25.oles.jacek.constant.Constants;
 
@@ -12,12 +12,13 @@ import java.util.Map;
 import java.util.Optional;
 
 public class JdbcReleaseToTicketDao {
-    private final Connection connection = DatabaseUtils.getConnection();
-
-    public JdbcReleaseToTicketDao() throws SQLException {
+    private JdbcReleaseToTicketDao() {
     }
 
-    public Optional<AbstractMap.SimpleEntry<Integer, Integer>> insertReleaseIdToTicketId(Integer releaseId, Integer ticketId) throws SQLException {
+    static Optional<AbstractMap.SimpleEntry<Integer, Integer>> insertReleaseIdToTicketId(
+            Integer releaseId,
+            Integer ticketId,
+            Connection connection) throws SQLException {
         String insert = String.format(
                 "INSERT INTO %s (%s) VALUES (%s)",
                 Constants.Tables.RELEASES_TO_TICKETS,
@@ -37,7 +38,7 @@ public class JdbcReleaseToTicketDao {
         return Optional.of(new AbstractMap.SimpleEntry<>(releaseId, ticketId));
     }
 
-    public Map<Integer, Integer> selectReleaseIdToTicketIdMap() throws SQLException {
+    static Map<Integer, Integer> selectReleaseIdToTicketIdMap(Connection connection) throws SQLException {
         Map<Integer, Integer> releaseIdToTicketIdMap = new HashMap<>();
         String select = "SELECT * FROM " + Constants.Tables.RELEASES_TO_TICKETS;
         ResultSet resultSet = connection.createStatement().executeQuery(select);

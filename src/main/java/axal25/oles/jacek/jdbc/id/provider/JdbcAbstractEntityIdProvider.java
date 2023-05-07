@@ -1,9 +1,8 @@
-package axal25.oles.jacek.jdbc;
+package axal25.oles.jacek.jdbc.id.provider;
 
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -11,26 +10,20 @@ import java.util.stream.Stream;
 
 public abstract class JdbcAbstractEntityIdProvider {
 
-    private Set<Integer> fetched = null;
     private final Set<Integer> handedOut = new HashSet<>();
 
     protected JdbcAbstractEntityIdProvider() {
     }
 
-    protected synchronized int generatedId() {
-        Optional<Set<Integer>> optionalFreshIds = Optional.empty();
+    protected synchronized int instanceGenerateId() {
+        Set<Integer> freshIds;
         try {
-            optionalFreshIds = Optional.of(fetchIds());
+            freshIds = fetchIds();
         } catch (SQLException e) {
+            throw new RuntimeException("Couldn't fetch Ids.", e);
         }
 
-        optionalFreshIds.ifPresent(freshIds -> fetched = freshIds);
-
-        if (fetched == null) {
-            throw new IllegalStateException("Couldn't fetch or use cached ids to generate new id.");
-        }
-
-        Set<Integer> combined = Stream.of(fetched, handedOut)
+        Set<Integer> combined = Stream.of(freshIds, handedOut)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
 

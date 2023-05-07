@@ -1,4 +1,4 @@
-package axal25.oles.jacek.util.biginteger;
+package axal25.oles.jacek.util;
 
 import java.math.BigInteger;
 import java.util.Random;

@@ -1,4 +1,4 @@
-package axal25.oles.jacek.jdbc;
+package axal25.oles.jacek.jdbc.dao;
 
 import axal25.oles.jacek.constant.Constants;
 import axal25.oles.jacek.entity.ApplicationEntity;
@@ -14,12 +14,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class JdbcApplicationToReleaseDao {
-    private final Connection connection = DatabaseUtils.getConnection();
-
-    public JdbcApplicationToReleaseDao() throws SQLException {
+    private JdbcApplicationToReleaseDao() {
     }
 
-    public Map<Integer, Integer> selectApplicationIdToReleaseIdMap() throws SQLException {
+    public static Map<Integer, Integer> selectApplicationIdToReleaseIdMap(Connection connection) throws SQLException {
         String select = "SELECT * FROM " + Constants.Tables.APPLICATIONS_TO_RELEASES;
         ResultSet resultSet = connection.createStatement().executeQuery(select);
 
@@ -32,7 +30,7 @@ public class JdbcApplicationToReleaseDao {
         return applicationIdToReleaseIdMap;
     }
 
-    public Optional<SimpleEntry<Integer, Integer>> selectApplicationIdToReleaseIdByApplicationId(Integer applicationId) throws SQLException {
+    public static Optional<SimpleEntry<Integer, Integer>> selectApplicationIdToReleaseIdByApplicationId(Integer applicationId, Connection connection) throws SQLException {
         if (applicationId == null) {
             throw new SQLException(ReleaseEntity.class.getSimpleName() +
                     "'s " +
@@ -55,7 +53,7 @@ public class JdbcApplicationToReleaseDao {
         return Optional.empty();
     }
 
-    public Optional<SimpleEntry<Integer, Integer>> selectApplicationIdToReleaseIdByReleaseId(Integer releaseId) throws SQLException {
+    public static Optional<SimpleEntry<Integer, Integer>> selectApplicationIdToReleaseIdByReleaseId(Integer releaseId, Connection connection) throws SQLException {
         if (releaseId == null) {
             throw new SQLException(ReleaseEntity.class.getSimpleName() +
                     "'s " +
@@ -78,7 +76,7 @@ public class JdbcApplicationToReleaseDao {
         return Optional.empty();
     }
 
-    public Map<Integer, Integer> selectApplicationIdToReleaseIdMapByApplicationIds(List<Integer> applicationIds) throws SQLException {
+    public static Map<Integer, Integer> selectApplicationIdToReleaseIdMapByApplicationIds(List<Integer> applicationIds, Connection connection) throws SQLException {
         if (applicationIds == null || applicationIds.stream().anyMatch(Objects::isNull)) {
             throw new SQLException(ApplicationEntity.class.getSimpleName() + "'s ids cannot be null");
         }
@@ -112,7 +110,7 @@ public class JdbcApplicationToReleaseDao {
         return applicationIdToReleaseIdMap;
     }
 
-    public Map<Integer, Integer> selectApplicationIdToReleaseIdMapByReleaseIds(List<Integer> releaseIds) throws SQLException {
+    public static Map<Integer, Integer> selectApplicationIdToReleaseIdMapByReleaseIds(List<Integer> releaseIds, Connection connection) throws SQLException {
         if (releaseIds == null || releaseIds.stream().anyMatch(Objects::isNull)) {
             throw new SQLException(ReleaseEntity.class.getSimpleName() + "'s ids cannot be null");
         }
@@ -146,7 +144,7 @@ public class JdbcApplicationToReleaseDao {
         return applicationIdToReleaseIdMap;
     }
 
-    public Optional<SimpleEntry<Integer, Integer>> insertApplicationIdToReleaseId(Integer applicationId, Integer releaseId) throws SQLException {
+    public static Optional<SimpleEntry<Integer, Integer>> insertApplicationIdToReleaseId(Integer applicationId, Integer releaseId, Connection connection) throws SQLException {
         String insert = String.format(
                 "INSERT INTO %s (%s) VALUES (%s)",
                 Constants.Tables.APPLICATIONS_TO_RELEASES,

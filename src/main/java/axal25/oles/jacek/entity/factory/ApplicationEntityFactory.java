@@ -1,44 +1,62 @@
 package axal25.oles.jacek.entity.factory;
 
 import axal25.oles.jacek.entity.ApplicationEntity;
-import axal25.oles.jacek.jdbc.JdbcApplicationEntityIdProvider;
-import lombok.AllArgsConstructor;
+import axal25.oles.jacek.jdbc.id.provider.JdbcApplicationEntityIdProvider;
 
 import javax.annotation.Nullable;
+import java.util.Random;
 
-@AllArgsConstructor
-public class ApplicationEntityFactory {
+public class ApplicationEntityFactory implements EntityFactory<Integer> {
+    private static final Random random = new Random();
+    private static final ApplicationEntityFactory factory = new ApplicationEntityFactory();
+
+    private ApplicationEntityFactory() {
+    }
 
     public static ApplicationEntity produce(
             String expectedMethodName,
             Class<?> methodOwnerClass,
-            @Nullable Integer applicationId) {
+            @Nullable Integer applicationId,
+            EntityFactory.IdGenerateMode idGenerateMode) {
+
         String methodName = MethodNameValidator
                 .getValidatedMethodName(expectedMethodName, methodOwnerClass);
-        FieldValueFormatter fieldValueFormatter = new FieldValueFormatter(ApplicationEntity.class);
 
         if (applicationId == null) {
-            applicationId = JdbcApplicationEntityIdProvider.generateId();
+            applicationId = factory.getId(applicationId, idGenerateMode);
         }
 
         ApplicationEntity application = new ApplicationEntity();
         application.setId(applicationId);
         application.setName(
-                fieldValueFormatter.getStringValue(
+                FieldValueFormatter.getStringValue(
+                        ApplicationEntity.class,
                         "name",
                         methodName,
                         application.getId()));
         application.setDescription(
-                fieldValueFormatter.getStringValue(
+                FieldValueFormatter.getStringValue(
+                        ApplicationEntity.class,
                         "description",
                         methodName,
                         application.getId()));
         application.setOwner(
-                fieldValueFormatter.getStringValue(
+                FieldValueFormatter.getStringValue(
+                        ApplicationEntity.class,
                         "owner",
                         methodName,
                         application.getId()));
 
         return application;
+    }
+
+    @Override
+    public Integer getIdFromJdbc() {
+        return JdbcApplicationEntityIdProvider.generateId();
+    }
+
+    @Override
+    public Integer generateRandomId() {
+        return random.nextInt();
     }
 }

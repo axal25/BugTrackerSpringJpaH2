@@ -2,6 +2,8 @@ package axal25.oles.jacek.controller;
 
 import axal25.oles.jacek.config.AppInfoListener;
 import axal25.oles.jacek.entity.ApplicationEntity;
+import axal25.oles.jacek.entity.factory.ApplicationEntityFactory;
+import axal25.oles.jacek.entity.factory.EntityFactory;
 import axal25.oles.jacek.json.JsonProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,13 +51,17 @@ public class ApplicationControllerTest {
 
     @Test
     public void addApplication_responseStatusCreated_applicationWithId_headerLocationGetApplication() throws Exception {
-        ApplicationEntity inputBodyApplication = getApplication(1).toBuilder().id(null).build();
+        ApplicationEntity inputBodyApplication = ApplicationEntityFactory.produce(
+                "addApplication_responseStatusCreated_applicationWithId_headerLocationGetApplication",
+                getClass(),
+                null,
+                EntityFactory.IdGenerateMode.NULL);
         ApplicationEntity responseApplication =
-                addApplication_responseStatusCreated_applicationWithId_headerLocationGetApplication(
+                addApplicationResponseStatusCreatedApplicationWithIdHeaderLocationGetApplication(
                         inputBodyApplication);
     }
 
-    private ApplicationEntity addApplication_responseStatusCreated_applicationWithId_headerLocationGetApplication(
+    private ApplicationEntity addApplicationResponseStatusCreatedApplicationWithIdHeaderLocationGetApplication(
             ApplicationEntity inputBodyApplication) throws Exception {
         assertThat(inputBodyApplication.getId()).isNull();
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -91,9 +97,13 @@ public class ApplicationControllerTest {
 
     @Test
     public void getApplicationById_response() throws Exception {
-        ApplicationEntity addInputBodyApplication = getApplication(2).toBuilder().id(null).build();
+        ApplicationEntity addInputBodyApplication = ApplicationEntityFactory.produce(
+                "getApplicationById_response",
+                getClass(),
+                null,
+                EntityFactory.IdGenerateMode.NULL);
         ApplicationEntity addResponseApplication =
-                addApplication_responseStatusCreated_applicationWithId_headerLocationGetApplication(
+                addApplicationResponseStatusCreatedApplicationWithIdHeaderLocationGetApplication(
                         addInputBodyApplication);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -113,9 +123,13 @@ public class ApplicationControllerTest {
 
     @Test
     public void updateApplication() throws Exception {
-        ApplicationEntity addInputBodyApplication = getApplication(3).toBuilder().id(null).build();
+        ApplicationEntity addInputBodyApplication = ApplicationEntityFactory.produce(
+                "updateApplication",
+                getClass(),
+                null,
+                EntityFactory.IdGenerateMode.NULL);
         ApplicationEntity addResponseApplication =
-                addApplication_responseStatusCreated_applicationWithId_headerLocationGetApplication(
+                addApplicationResponseStatusCreatedApplicationWithIdHeaderLocationGetApplication(
                         addInputBodyApplication);
 
         ApplicationEntity updateInputBodyApplication = addResponseApplication.toBuilder()
@@ -150,10 +164,14 @@ public class ApplicationControllerTest {
     }
 
     @Test
-    void deleteApplication() throws Exception {
-        ApplicationEntity addInputBodyApplication = getApplication(4).toBuilder().id(null).build();
+    public void deleteApplication() throws Exception {
+        ApplicationEntity addInputBodyApplication = ApplicationEntityFactory.produce(
+                "deleteApplication",
+                getClass(),
+                null,
+                EntityFactory.IdGenerateMode.NULL);
         ApplicationEntity addResponseApplication =
-                addApplication_responseStatusCreated_applicationWithId_headerLocationGetApplication(
+                addApplicationResponseStatusCreatedApplicationWithIdHeaderLocationGetApplication(
                         addInputBodyApplication);
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete(applicationControllerEnpointPathFull + "/" + addResponseApplication.getId())
@@ -162,13 +180,5 @@ public class ApplicationControllerTest {
         MvcResult mvcResult = mockMvc.perform(requestBuilder).andReturn();
 
         assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
-
-    private static ApplicationEntity getApplication(int id) {
-        return new ApplicationEntity(
-                id,
-                "application name " + id,
-                "application description " + id,
-                "application owner " + id);
     }
 }
