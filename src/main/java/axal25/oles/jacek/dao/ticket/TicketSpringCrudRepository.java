@@ -4,11 +4,12 @@ import axal25.oles.jacek.entity.TicketEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-@Repository("SpringCrudRepository")
+@Repository("springCrudRepository")
 public interface TicketSpringCrudRepository extends CrudRepository<TicketEntity, Integer>, ITicketDao {
 
     @Override
@@ -27,14 +28,21 @@ public interface TicketSpringCrudRepository extends CrudRepository<TicketEntity,
         return findById(ticketId).orElse(null);
     }
 
+    @Transactional
     @Override
-    default void updateTicket(TicketEntity ticket) {
+    default void updateTicket(TicketEntity updated) {
+        TicketEntity existing = getTicketById(updated.getId());
+        existing.setDescription(updated.getDescription());
+        existing.setApplication(updated.getApplication());
+        existing.setTitle(updated.getTitle());
 
     }
 
+    @Transactional
     @Override
     default void closeTicketById(int ticketId) {
-
+        TicketEntity existing = getTicketById(ticketId);
+        existing.setStatus("Resolved");
     }
 
     @Override

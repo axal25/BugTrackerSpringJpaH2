@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Transactional
 @Repository
@@ -24,6 +25,7 @@ public class ReleaseDao implements IReleaseDao {
     @Override
     public void addRelease(ReleaseEntity release) {
         entityManager.persist(release);
+        entityManager.flush();
     }
 
     @Override
@@ -37,5 +39,13 @@ public class ReleaseDao implements IReleaseDao {
     @Override
     public ReleaseEntity getReleaseById(int releaseId) {
         return entityManager.find(ReleaseEntity.class, releaseId);
+    }
+
+    @Override
+    public List<ReleaseEntity> getAllReleases() {
+        String jpqlQuery = "SELECT release from " +
+                ReleaseEntity.class.getSimpleName() +
+                " release ORDER BY release.id";
+        return entityManager.createQuery(jpqlQuery, ReleaseEntity.class).getResultList();
     }
 }

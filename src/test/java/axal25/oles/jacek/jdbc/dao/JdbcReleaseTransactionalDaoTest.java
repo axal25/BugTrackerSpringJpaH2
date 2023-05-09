@@ -4,22 +4,22 @@ import axal25.oles.jacek.entity.ReleaseEntity;
 import axal25.oles.jacek.entity.factory.EntityFactory;
 import axal25.oles.jacek.entity.factory.ReleaseEntityFactory;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.sql.SQLException;
-import java.util.Optional;
 
 import static com.google.common.truth.Truth.assertThat;
 
+@Execution(ExecutionMode.SAME_THREAD)
 @SpringBootTest
-public class JdbcReleaseDaoTransactionalTest {
+public class JdbcReleaseTransactionalDaoTest {
+
+    @Autowired
+    private JdbcReleaseTransactionalDao jdbcReleaseTransactionalDao;
 
     @Test
-    public void insertReleaseTransactional_isInsertedSuccessfully() throws SQLException {
-        // TODO: restore
-        if (true)
-            return;
-        
+    public void insertReleaseTransactional_isInsertedSuccessfully() {
         ReleaseEntity inputRelease = ReleaseEntityFactory.produce(
                 "insertReleaseTransactional_isInsertedSuccessfully",
                 getClass(),
@@ -27,10 +27,9 @@ public class JdbcReleaseDaoTransactionalTest {
                 null,
                 EntityFactory.IdGenerateMode.FROM_JDBC);
 
-        Optional<ReleaseEntity> inserted = JdbcReleaseTransactionalDao.insertReleaseTransactional(inputRelease);
+        ReleaseEntity inserted =
+                jdbcReleaseTransactionalDao.insertReleaseTransactional(inputRelease);
 
-        assertThat(inserted).isNotNull();
-        assertThat(inserted.isPresent()).isTrue();
-        assertThat(inserted.get()).isEqualTo(inputRelease);
+        assertThat(inserted).isEqualTo(inputRelease);
     }
 }

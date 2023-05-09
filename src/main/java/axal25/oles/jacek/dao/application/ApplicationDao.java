@@ -7,7 +7,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Transactional
 @Repository
@@ -22,15 +21,13 @@ public class ApplicationDao implements IApplicationDao {
         String jpqlQuery = "SELECT application from " +
                 ApplicationEntity.class.getSimpleName() +
                 " application ORDER BY application.id";
-        List<?> resultList = entityManager.createQuery(jpqlQuery).getResultList();
-        return resultList.stream()
-                .map(application -> (ApplicationEntity) application)
-                .collect(Collectors.toList());
+        return entityManager.createQuery(jpqlQuery, ApplicationEntity.class).getResultList();
     }
 
     @Override
     public void addApplication(ApplicationEntity application) {
         entityManager.persist(application);
+        entityManager.flush();
     }
 
     @Override
@@ -38,7 +35,7 @@ public class ApplicationDao implements IApplicationDao {
         String jpqlQuery = "FROM " +
                 ApplicationEntity.class.getSimpleName() +
                 " as app WHERE app.name = ?0 and app.owner = ?1";
-        int count = entityManager.createQuery(jpqlQuery)
+        int count = entityManager.createQuery(jpqlQuery, ApplicationEntity.class)
                 .setParameter(0, name)
                 .setParameter(1, owner)
                 .getResultList()
@@ -63,5 +60,6 @@ public class ApplicationDao implements IApplicationDao {
     @Override
     public void deleteApplication(int applicationId) {
         entityManager.remove(getApplicationById(applicationId));
+        entityManager.flush();
     }
 }

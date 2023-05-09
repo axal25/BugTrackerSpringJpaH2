@@ -12,18 +12,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @Execution(ExecutionMode.SAME_THREAD)
 @SpringBootTest
-public class TicketCrudRepositoryTest {
+public class TicketNonJtaDaoTest {
 
     @Autowired
-    @Qualifier("springCrudRepository")
+    @Qualifier("nonJtaDao")
     private ITicketDao ticketDao;
+
     @Autowired
     private DaoTestHelper daoTestHelper;
+
     private ITicketDaoTester tester;
 
     @BeforeAll
     static void beforeAll() {
-        ITicketDaoTester.validateAllTestMethodsAreImplementedAndAnnotated(TicketCrudRepositoryTest.class);
+        ITicketDaoTester.validateAllTestMethodsAreImplementedAndAnnotated(TicketNonJtaDaoTest.class);
     }
 
     @BeforeEach

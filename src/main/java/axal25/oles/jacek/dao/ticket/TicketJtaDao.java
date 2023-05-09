@@ -7,13 +7,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * JTA = Java Transaction API
  */
 @Transactional
-@Repository("Jta")
+@Repository("jtaDao")
 public class TicketJtaDao implements ITicketDao {
 
     @PersistenceContext
@@ -21,18 +20,16 @@ public class TicketJtaDao implements ITicketDao {
 
     @Override
     public List<TicketEntity> getAllTickets() {
-        String jpqlQuery = "SELECT ticket FROM " +
+        String jpqlQuery = "SELECT ticket from " +
                 TicketEntity.class.getSimpleName() +
                 " ticket ORDER BY ticket.id";
-        List<?> resultSet = entityManager.createQuery(jpqlQuery).getResultList();
-        return resultSet.stream()
-                .map(ticket -> (TicketEntity) ticket)
-                .collect(Collectors.toList());
+        return entityManager.createQuery(jpqlQuery, TicketEntity.class).getResultList();
     }
 
     @Override
     public TicketEntity addTicket(TicketEntity ticket) {
         entityManager.persist(ticket);
+        entityManager.flush();
         return ticket;
     }
 
@@ -44,11 +41,9 @@ public class TicketJtaDao implements ITicketDao {
     @Override
     public void updateTicket(TicketEntity updated) {
         TicketEntity existing = getTicketById(updated.getId());
-
         existing.setDescription(updated.getDescription());
         existing.setApplication(updated.getApplication());
         existing.setTitle(updated.getTitle());
-
         entityManager.flush();
     }
 
@@ -56,10 +51,12 @@ public class TicketJtaDao implements ITicketDao {
     public void closeTicketById(int ticketId) {
         TicketEntity ticket = getTicketById(ticketId);
         ticket.setStatus("Resolved");
+        entityManager.flush();
     }
 
     @Override
     public void deleteTicketById(int ticketId) {
-        entityManager.remove(ticketId);
+        entityManager.remove(getTicketById(ticketId));
+        entityManager.flush();
     }
 }

@@ -1,18 +1,34 @@
 package axal25.oles.jacek.jdbc.dao;
 
 import axal25.oles.jacek.entity.ApplicationEntity;
-import axal25.oles.jacek.jdbc.DatabaseUtils;
+import org.apache.logging.log4j.LogManager;
+import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
 
+@Component
 public class JdbcApplicationTransactionalDao {
-    private JdbcApplicationTransactionalDao() {
+    private static final Logger slf4jLogger = LoggerFactory.getLogger(JdbcApplicationTransactionalDao.class);
+    private static final org.apache.logging.log4j.Logger log4jLogger = LogManager.getLogger(JdbcApplicationTransactionalDao.class);
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public ApplicationEntity insertApplicationTransactional(ApplicationEntity application) {
+        try (Session session = entityManager.unwrap(Session.class)) {
+            return session.doReturningWork((connection) ->
+                    insertApplicationTransactional(application, connection));
+        }
     }
 
-    public static Optional<ApplicationEntity> insertApplicationTransactional(ApplicationEntity application) throws SQLException {
-        Connection connection = DatabaseUtils.getConnection();
+    public ApplicationEntity insertApplicationTransactional(ApplicationEntity application, Connection connection) throws SQLException {
         Optional<ApplicationEntity> optApp;
 
         try {
@@ -30,10 +46,24 @@ public class JdbcApplicationTransactionalDao {
 
         if (optApp.isEmpty()) {
             connection.rollback();
-            return Optional.empty();
+            throw new JdbcDaoRuntimeException("Returned " +
+                    Optional.class +
+                    "<" +
+                    ApplicationEntity.class.getSimpleName() +
+                    "> was " +
+                    Optional.empty() +
+                    ".");
         }
 
         connection.commit();
-        return optApp;
+
+        slf4jLogger.error("inserted {}: {}",
+                ApplicationEntity.class.getSimpleName(),
+                optApp.get().toJsonPrettyString());
+        log4jLogger.error("inserted {}: {}",
+                ApplicationEntity.class.getSimpleName(),
+                optApp.get().toJsonPrettyString());
+
+        return optApp.get();
     }
 }

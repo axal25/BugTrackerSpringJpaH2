@@ -14,9 +14,9 @@ import java.util.List;
 public class TicketService implements ITicketService {
 
     @Autowired
-    @Qualifier("Jta")
+    @Qualifier("jtaDao")
     private ITicketDao ticketDao;
-    
+
     @Override
     public List<TicketEntity> getAllTickets() {
         return ticketDao.getAllTickets();
