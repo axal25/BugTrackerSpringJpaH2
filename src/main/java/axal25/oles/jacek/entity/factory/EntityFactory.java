@@ -1,6 +1,25 @@
 package axal25.oles.jacek.entity.factory;
 
 public interface EntityFactory<T extends Object> {
+
+    /**
+     * Generates fake id for other fields than entity's id field if previously generated id is null.
+     **/
+    default T getIdForNonIdFields(T entityIdFieldValue, IdGenerateMode idGenerateMode) {
+        if (entityIdFieldValue != null) {
+            return entityIdFieldValue;
+        }
+        if (IdGenerateMode.NULL.equals(idGenerateMode)) {
+            idGenerateMode = IdGenerateMode.DEFAULT;
+        }
+        return getId(null, idGenerateMode);
+    }
+
+    /**
+     * @param id             nullable. Input id.
+     * @param idGenerateMode strategy type used to generate id.
+     * @return generated id for entity's id field. Can return null.
+     */
     default T getId(T id, IdGenerateMode idGenerateMode) {
         if (idGenerateMode == null) {
             throw new RuntimeException("Argument \"" +
@@ -44,6 +63,15 @@ public interface EntityFactory<T extends Object> {
                             " then argument \"id\" should be <null>.");
                 }
                 return getIdFromJdbc();
+            case FROM_ENTITY_MANAGER:
+                if (id != null) {
+                    throw new RuntimeException("If argument \"" +
+                            IdGenerateMode.class.getSimpleName() +
+                            "\" is " +
+                            IdGenerateMode.FROM_ENTITY_MANAGER.name() +
+                            " then argument \"id\" should be <null>.");
+                }
+                return getIdFromEntityManager();
             default:
                 throw new UnsupportedOperationException("Argument \"" +
                         IdGenerateMode.class.getSimpleName() +
@@ -55,9 +83,12 @@ public interface EntityFactory<T extends Object> {
 
     T getIdFromJdbc();
 
+    T getIdFromEntityManager();
+
     T generateRandomId();
 
     enum IdGenerateMode {
-        NULL, RANDOM, FROM_JDBC, IMPOSED
+        NULL, RANDOM, /* TODO: remove */ FROM_JDBC, IMPOSED, FROM_ENTITY_MANAGER;
+        public static final IdGenerateMode DEFAULT = IdGenerateMode.FROM_ENTITY_MANAGER;
     }
 }

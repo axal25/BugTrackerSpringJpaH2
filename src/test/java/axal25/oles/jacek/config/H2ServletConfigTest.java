@@ -11,8 +11,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static com.google.common.truth.Truth.assertThat;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {H2Configuration.class})
-public class H2ConfigurationTest {
+@ContextConfiguration(classes = {H2ServletConfig.class})
+public class H2ServletConfigTest {
 
     @Autowired
     private ServletRegistrationBean<WebServlet> h2ServletRegistrationBean;

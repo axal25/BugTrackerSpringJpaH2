@@ -1,6 +1,5 @@
 package axal25.oles.jacek.dao.ticket;
 
-import axal25.oles.jacek.dao.DaoTestHelper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,10 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class TicketCrudRepositoryTest {
 
     @Autowired
-    @Qualifier("springCrudRepository")
+    @Qualifier("crudRepository")
     private ITicketDao ticketDao;
-    @Autowired
-    private DaoTestHelper daoTestHelper;
     private ITicketDaoTester tester;
 
     @BeforeAll
@@ -35,20 +32,20 @@ public class TicketCrudRepositoryTest {
             }
 
             @Override
-            public DaoTestHelper getDaoTestHelper() {
-                return daoTestHelper;
+            public Class<?> getTestClass() {
+                return TicketCrudRepositoryTest.class;
             }
         };
     }
 
     @Test
-    public void updateTicket() {
-        tester.updateTicket();
+    public void updateTicket_updatesDescriptionAndTitle() {
+        tester.updateTicket_updatesDescriptionAndTitle();
     }
 
     @Test
-    public void closeTicket() {
-        tester.closeTicket();
+    public void closeTicket_updatesStatusToResolvedValue() {
+        tester.closeTicket_updatesStatusToResolvedValue();
     }
 
     @Test
@@ -57,18 +54,23 @@ public class TicketCrudRepositoryTest {
     }
 
     @Test
-    public void getAllTickets_containsAddedTicket() {
-        tester.getAllTickets_containsAddedTicket();
+    public void getAllTickets_containsAddedTicket_skippingLazilyFetchedEntities() {
+        tester.getAllTickets_containsAddedTicket_skippingLazilyFetchedEntities();
     }
 
     @Test
-    public void getTicketById_IsEqualToAddedTicket_includingLazyFetchedEntities() {
-        tester.getTicketById_IsEqualToAddedTicket_includingLazyFetchedEntities();
+    public void getAllTicketsEagerly_containsAddedTicket_includingLazilyFetchedEntities() {
+        tester.getAllTicketsEagerly_containsAddedTicket_includingLazilyFetchedEntities();
     }
 
     @Test
-    public void getTicketById_isEqualToAddedTicket_skippingLazyFetchedEntities() {
-        tester.getTicketById_isEqualToAddedTicket_skippingLazyFetchedEntities();
+    public void getTicketByIdEagerly_IsEqualToAddedTicket_includingLazilyFetchedEntities() {
+        tester.getTicketByIdEagerly_IsEqualToAddedTicket_includingLazilyFetchedEntities();
+    }
+
+    @Test
+    public void getTicketById_isEqualToAddedTicket_skippingLazilyFetchedEntities() {
+        tester.getTicketById_isEqualToAddedTicket_skippingLazilyFetchedEntities();
     }
 
     @Test

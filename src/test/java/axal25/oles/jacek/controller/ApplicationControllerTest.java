@@ -1,10 +1,12 @@
 package axal25.oles.jacek.controller;
 
-import axal25.oles.jacek.config.AppInfoListener;
+import axal25.oles.jacek.context.info.AppInfoListener;
+import axal25.oles.jacek.context.info.BugTrackerAppStatusProducerOnApplicationReady;
 import axal25.oles.jacek.entity.ApplicationEntity;
 import axal25.oles.jacek.entity.factory.ApplicationEntityFactory;
 import axal25.oles.jacek.entity.factory.EntityFactory;
 import axal25.oles.jacek.json.JsonProvider;
+import axal25.oles.jacek.util.CollectionUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,18 +39,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class ApplicationControllerTest {
 
-    private String applicationControllerEnpointPathFull;
+    private String applicationControllerEndpointPathFull;
 
     @Autowired
-    private AppInfoListener appInfoListener;
+    private BugTrackerAppStatusProducerOnApplicationReady bugTrackerAppStatusProducerOnApplicationReady;
 
     @Autowired
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        applicationControllerEnpointPathFull =
-                appInfoListener.getFullHostAddress() +
+        if (bugTrackerAppStatusProducerOnApplicationReady
+                .getBugTrackerAppStatusProducer()
+                .getFullHostAddress() == null) {
+            throw new IllegalStateException(
+                    String.format("Couldn't get Full Host Address. %s state: %s.",
+                            AppInfoListener.class.getSimpleName(),
+                            CollectionUtils.lengthyStringToString(
+                                    bugTrackerAppStatusProducerOnApplicationReady
+                                            .getBugTrackerAppStatusProducer()
+                                            .toStateStringStream())));
+        }
+
+        applicationControllerEndpointPathFull =
+                bugTrackerAppStatusProducerOnApplicationReady
+                        .getBugTrackerAppStatusProducer()
+                        .getFullHostAddress() +
                         APPLICATION_CONTROLLER;
     }
 
@@ -68,7 +84,7 @@ public class ApplicationControllerTest {
             ApplicationEntity inputBodyApplication) throws Exception {
         assertThat(inputBodyApplication.getId()).isNull();
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post(applicationControllerEnpointPathFull)
+                .post(applicationControllerEndpointPathFull)
                 .accept(ALL)
                 .contentType(APPLICATION_JSON)
                 .content(inputBodyApplication.toJsonString());
@@ -82,7 +98,7 @@ public class ApplicationControllerTest {
 
         assertThat(mvcResult.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(mvcResult.getResponse().getHeader(HttpHeaders.LOCATION))
-                .startsWith(applicationControllerEnpointPathFull + "/");
+                .startsWith(applicationControllerEndpointPathFull + "/");
         assertThat(mvcResult.getResponse().getHeader(HttpHeaders.LOCATION))
                 .matches(".*/[0-9]*");
         assertThat(mvcResult.getResponse().getContentType()).isEqualTo(APPLICATION_JSON_VALUE);
@@ -110,7 +126,7 @@ public class ApplicationControllerTest {
                         addInputBodyApplication);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get(applicationControllerEnpointPathFull + "/" + addResponseApplication.getId())
+                .get(applicationControllerEndpointPathFull + "/" + addResponseApplication.getId())
                 .accept(ALL);
 
         MvcResult mvcResult = mockMvc.perform(requestBuilder)
@@ -142,7 +158,7 @@ public class ApplicationControllerTest {
                 .build();
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .put(applicationControllerEnpointPathFull)
+                .put(applicationControllerEndpointPathFull)
                 .accept(ALL)
                 .contentType(APPLICATION_JSON)
                 .content(updateInputBodyApplication.toJsonString());
@@ -177,7 +193,7 @@ public class ApplicationControllerTest {
                 addApplicationResponseStatusCreatedApplicationWithIdHeaderLocationGetApplication(
                         addInputBodyApplication);
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .delete(applicationControllerEnpointPathFull + "/" + addResponseApplication.getId())
+                .delete(applicationControllerEndpointPathFull + "/" + addResponseApplication.getId())
                 .accept(ALL);
 
         MvcResult mvcResult = mockMvc.perform(requestBuilder).andReturn();

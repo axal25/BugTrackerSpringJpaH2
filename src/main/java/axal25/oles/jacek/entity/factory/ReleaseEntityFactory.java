@@ -1,12 +1,12 @@
 package axal25.oles.jacek.entity.factory;
 
+import axal25.oles.jacek.dao.release.DaoReleaseEntityIdProvider;
 import axal25.oles.jacek.entity.ApplicationEntity;
 import axal25.oles.jacek.entity.ReleaseEntity;
 import axal25.oles.jacek.jdbc.id.provider.JdbcReleaseEntityIdProvider;
 import axal25.oles.jacek.util.LocalDateUtils;
 
 import javax.annotation.Nullable;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -22,35 +22,38 @@ public class ReleaseEntityFactory implements EntityFactory<Integer> {
     public static ReleaseEntity produce(
             String expectedMethodName,
             Class<?> methodOwnerClass,
-            @Nullable Integer releaseId,
+            @Nullable Integer id,
             @Nullable List<ApplicationEntity> applications,
             EntityFactory.IdGenerateMode idGenerateMode) {
 
         String methodName = MethodNameValidator.getValidatedMethodName(expectedMethodName, methodOwnerClass);
 
-        if (releaseId == null) {
-            releaseId = factory.getId(releaseId, idGenerateMode);
+        if (id == null) {
+            id = factory.getId(id, idGenerateMode);
         }
 
         if (applications == null) {
-            applications = IntStream.range(0, random.nextInt() % 10)
+            applications = IntStream.range(0, random.nextInt(10) + 1)
                     .mapToObj(unused -> ApplicationEntityFactory.produce(
                             expectedMethodName,
                             methodOwnerClass,
                             null,
                             idGenerateMode))
-                    .sorted(Comparator.comparingInt(ApplicationEntity::getId))
+                    .sorted()
                     .collect(Collectors.toList());
         }
 
+
+        Integer idForNonIdFields = factory.getIdForNonIdFields(id, idGenerateMode);
+
         ReleaseEntity release = new ReleaseEntity();
-        release.setId(releaseId);
+        release.setId(id);
         release.setReleaseDate(LocalDateUtils.produceRandomPastSinceEpoch());
         release.setDescription(FieldValueFormatter.getStringValue(
                 ReleaseEntity.class,
                 "name",
                 methodName,
-                release.getId()));
+                idForNonIdFields));
         release.setApplications(applications);
 
         return release;
@@ -59,6 +62,11 @@ public class ReleaseEntityFactory implements EntityFactory<Integer> {
     @Override
     public Integer getIdFromJdbc() {
         return JdbcReleaseEntityIdProvider.generateId();
+    }
+
+    @Override
+    public Integer getIdFromEntityManager() {
+        return DaoReleaseEntityIdProvider.generateId();
     }
 
     @Override

@@ -1,7 +1,6 @@
 package axal25.oles.jacek.jdbc.dao;
 
 import axal25.oles.jacek.entity.ReleaseEntity;
-import axal25.oles.jacek.entity.factory.EntityFactory;
 import axal25.oles.jacek.entity.factory.ReleaseEntityFactory;
 import axal25.oles.jacek.jdbc.DatabaseUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -14,10 +13,12 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+import static axal25.oles.jacek.entity.factory.EntityFactory.IdGenerateMode.FROM_JDBC;
 import static com.google.common.truth.Truth.assertThat;
 
 @SpringBootTest
 public class JdbcReleaseDaoTest {
+    // TODO: rework
     private Connection connection;
 
     @BeforeEach
@@ -37,7 +38,7 @@ public class JdbcReleaseDaoTest {
                 getClass(),
                 null,
                 null,
-                EntityFactory.IdGenerateMode.FROM_JDBC);
+                FROM_JDBC);
 
         insertReleaseAndAssert(inputRelease);
 
@@ -53,7 +54,7 @@ public class JdbcReleaseDaoTest {
                 getClass(),
                 null,
                 null,
-                EntityFactory.IdGenerateMode.FROM_JDBC);
+                FROM_JDBC);
 
         insertReleaseAndAssert(inputRelease);
 
@@ -69,7 +70,7 @@ public class JdbcReleaseDaoTest {
                 getClass(),
                 null,
                 null,
-                EntityFactory.IdGenerateMode.FROM_JDBC);
+                FROM_JDBC);
 
         insertReleaseAndAssert(inputRelease);
     }

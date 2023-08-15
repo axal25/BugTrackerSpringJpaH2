@@ -7,9 +7,13 @@ import java.util.List;
 public interface ITicketDao {
     List<TicketEntity> getAllTickets();
 
+    List<TicketEntity> getAllTicketsEagerly();
+
     TicketEntity addTicket(TicketEntity ticket);
 
     TicketEntity getTicketById(int ticketId);
+
+    TicketEntity getTicketByIdEagerly(int ticketId);
 
     void updateTicket(TicketEntity ticket);
 

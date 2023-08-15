@@ -1,12 +1,12 @@
 package axal25.oles.jacek.entity.factory;
 
+import axal25.oles.jacek.dao.ticket.DaoTicketEntityIdProvider;
 import axal25.oles.jacek.entity.ApplicationEntity;
 import axal25.oles.jacek.entity.ReleaseEntity;
 import axal25.oles.jacek.entity.TicketEntity;
 import axal25.oles.jacek.jdbc.id.provider.JdbcTicketEntityIdProvider;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Random;
 
 public class TicketEntityFactory implements EntityFactory<Integer> {
@@ -19,48 +19,49 @@ public class TicketEntityFactory implements EntityFactory<Integer> {
     public static TicketEntity produce(
             String expectedMethodName,
             Class<?> methodOwnerClass,
-            @Nullable Integer ticketId,
+            @Nullable Integer id,
             @Nullable ApplicationEntity application,
             @Nullable ReleaseEntity release,
             EntityFactory.IdGenerateMode idGenerateMode) {
-        
+
         String methodName = MethodNameValidator
                 .getValidatedMethodName(expectedMethodName, methodOwnerClass);
 
-        if (ticketId == null) {
-            ticketId = factory.getId(ticketId, idGenerateMode);
-        }
-
-        if (application == null) {
-            application = ApplicationEntityFactory
-                    .produce(expectedMethodName, methodOwnerClass, null, idGenerateMode);
+        if (id == null) {
+            id = factory.getId(id, idGenerateMode);
         }
 
         if (release == null) {
             release = ReleaseEntityFactory
-                    .produce(expectedMethodName, methodOwnerClass, null, List.of(application), idGenerateMode);
+                    .produce(expectedMethodName, methodOwnerClass, null, null, idGenerateMode);
         }
 
+        if (application == null) {
+            application = release.getApplications().get(random.nextInt(release.getApplications().size()));
+        }
+
+        Integer idForNonIdFields = factory.getIdForNonIdFields(id, idGenerateMode);
+
         TicketEntity ticket = new TicketEntity();
-        ticket.setId(ticketId);
+        ticket.setId(id);
         ticket.setTitle(
                 FieldValueFormatter.getStringValue(
                         TicketEntity.class,
                         "title",
                         methodName,
-                        ticket.getId()));
+                        idForNonIdFields));
         ticket.setDescription(
                 FieldValueFormatter.getStringValue(
                         TicketEntity.class,
                         "description",
                         methodName,
-                        ticket.getId()));
+                        idForNonIdFields));
         ticket.setStatus(
                 FieldValueFormatter.getStringValue(
                         TicketEntity.class,
                         "status",
                         methodName,
-                        ticket.getId()));
+                        idForNonIdFields));
         ticket.setApplication(application);
         ticket.setRelease(release);
 
@@ -71,6 +72,11 @@ public class TicketEntityFactory implements EntityFactory<Integer> {
     @Override
     public Integer getIdFromJdbc() {
         return JdbcTicketEntityIdProvider.generateId();
+    }
+
+    @Override
+    public Integer getIdFromEntityManager() {
+        return DaoTicketEntityIdProvider.generateId();
     }
 
     @Override

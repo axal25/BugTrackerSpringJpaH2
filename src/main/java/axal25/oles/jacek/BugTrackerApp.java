@@ -1,19 +1,17 @@
 package axal25.oles.jacek;
 
-import axal25.oles.jacek.dao.mock.Prefiller;
-import axal25.oles.jacek.log.EndpointPrinter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+import java.util.List;
 
 @SpringBootApplication
 public class BugTrackerApp {
-    // http://localhost:8080/console
-    // http://localhost:8080/bug-tracker/status
-    // http://jackdaeel-lt-ubuntu:8080/bug-tracker/status
+    private static ApplicationContext applicationContext;
+
     public static void main(String[] args) {
-        SpringApplication.run(BugTrackerApp.class, args);
-        Prefiller.prefillInMemDb();
-        EndpointPrinter.printEndpoints();
+        applicationContext = SpringApplication.run(BugTrackerApp.class, args);
         // TODO: Finished at
         //  https://www.linkedin.com/learning/java-persistence-api-jpa-1-the-basics/mapping-strategies-overview?autoSkip=true&autoplay=true&resume=false&u=2113185
         //  4. Relationship Mapping in JPA > 4.1. Relationships
@@ -22,5 +20,11 @@ public class BugTrackerApp {
         //  2) CrudRepository
         //  3) @Query (Native vs. JPQL) - https://www.baeldung.com/spring-data-jpa-query
         //  4) Exception handling - https://www.baeldung.com/exception-handling-for-rest-with-spring
+    }
+
+    private static class DBStudent {
+        private int id;
+        private String name;
+        private List<String> lessons;
     }
 }

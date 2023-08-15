@@ -1,0 +1,41 @@
+:root {
+  --menu-background-height: 100%;
+}
+
+body {
+  background-color: rgb(20, 20, 20);
+  color: gray;
+  margin: 0px;
+}
+
+#menu-items {
+  z-index: 2;
+  position: relative;
+  margin-left: clamp(4rem, 20vw, 48rem);
+}
+
+a {
+  text-decoration: none;
+}
+
+.menu-item {
+  font-size: clamp(1rem, 3vw, 1rem);
+  padding: clamp(0.25rem, 0.5vw, 1rem) 0rem;
+  color: rgb(180, 180, 180);
+  font-family: "Ibarra Real Nova", serif;
+  display: block;
+  transition: opacity 400ms ease;
+}
+
+.menu-item > span {
+  color: rgb(220, 220, 220);
+  font-size: clamp(3rem, 8vw, 1rem);
+}
+
+#menu-items:hover > .menu-item {
+  opacity: 0.3;
+}
+
+#menu-items:hover > .menu-item:hover {
+  opacity: 1;
+}

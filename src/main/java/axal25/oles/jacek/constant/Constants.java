@@ -1,7 +1,6 @@
 package axal25.oles.jacek.constant;
 
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 public class Constants {
 
@@ -11,6 +10,7 @@ public class Constants {
     }
 
     public static class EndpointPaths {
+        public static final String H2_DB_CONSOLE = "/console";
 
         public static final String BUG_TRACKER_CONTROLLER = "/bug-tracker";
         public static final String APPLICATION_CONTROLLER =
@@ -19,10 +19,23 @@ public class Constants {
                 BUG_TRACKER_CONTROLLER + "/release";
         public static final String TICKET_CONTROLLER =
                 BUG_TRACKER_CONTROLLER + "/ticket";
+
+        public static class WebEndpointPaths {
+            public static final String WEB_CONTROLLER = BUG_TRACKER_CONTROLLER + "/web";
+            public static final String APPLICATION_WEB_CONTROLLER = WEB_CONTROLLER + "/application";
+        }
+    }
+
+    public static class Templates {
+        public static final String ALL_APPLICATIONS = "all_applications";
     }
 
     public static class Tables {
         public static final String APPLICATIONS = "applications";
+        public static final String RELEASES = "releases";
+        public static final String APPLICATIONS_TO_RELEASES = "Releases_Applications";
+        public static final String TICKETS = "tickets";
+        public static final String RELEASES_TO_TICKETS = "ticket_release";
 
         public static class Applications {
             public static final String ID = "application_id";
@@ -32,22 +45,16 @@ public class Constants {
             public static final String ORDER_BY = Constants.Tables.Applications.ID + " " + Constants.OrderBy.ASC;
         }
 
-        public static final String RELEASES = "releases";
-
         public static class Releases {
             public static final String ID = "id";
             public static final String RELEASE_DATE = "release_date";
             public static final String DESCRIPTION = "description";
         }
 
-        public static final String APPLICATIONS_TO_RELEASES = "Releases_Applications";
-
         public static class ApplicationsToReleases {
             public static final String RELEASE_ID = "release_entity_id";
             public static final String APPLICATION_ID = "applications_application_id";
         }
-
-        public static final String TICKETS = "tickets";
 
         public static class Tickets {
             public static final String ID = "id";
@@ -56,8 +63,6 @@ public class Constants {
             public static final String DESCRIPTION = "description";
             public static final String APPLICATION_ID = "application_id";
         }
-
-        public static final String RELEASES_TO_TICKETS = "ticket_release";
 
         public static class ReleasesToTickets {
             public static final String RELEASE_ID = "release_fk";
@@ -68,7 +73,7 @@ public class Constants {
     public static class Database {
         public static final String databaseName = "bugtracker";
         public static final String userName = "sa";
-        public static final String password = "";
+        public static final String password = "sa";
     }
 
     public static class Formatters {

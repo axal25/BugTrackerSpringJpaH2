@@ -134,7 +134,7 @@ public class JdbcReleaseDao {
                             "'s " +
                             ApplicationEntity.class.getSimpleName() +
                             "s: " +
-                            CollectionUtils.lengthyElementsToString(
+                            CollectionUtils.lengthyStringsToString(
                                     release.getApplications().stream()
                                             .map(JsonObject::toJsonPrettyString)
                                             .collect(Collectors.toList())) +

@@ -1,6 +1,7 @@
 package axal25.oles.jacek.port;
 
-import axal25.oles.jacek.config.AppInfoListener;
+import axal25.oles.jacek.context.info.BugTrackerAppStatusProducerOnApplicationReady;
+import axal25.oles.jacek.model.BugTrackerAppStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +17,15 @@ import static com.google.common.truth.Truth.assertThat;
 public class RandomPortTest {
 
     @Autowired
-    private AppInfoListener appInfoListener;
+    private BugTrackerAppStatusProducerOnApplicationReady bugTrackerAppStatusProducerOnApplicationReady;
 
     @Test
     void isPortRandom() {
-        assertThat(appInfoListener.getPort()).isEqualTo(0);
-        assertThat(appInfoListener.getLocal().getPort()).isNotNull();
-        assertThat(appInfoListener.getLocal().getPort() > -1).isTrue();
-        assertThat(appInfoListener.getRemote().getPort()).isNull();
+        BugTrackerAppStatus bugTrackerAppStatus =
+                bugTrackerAppStatusProducerOnApplicationReady.getBugTrackerAppStatusProducer().getBugTrackerAppStatus();
+        assertThat(bugTrackerAppStatus.getServerDotPort()).isEqualTo(0);
+        assertThat(bugTrackerAppStatus.getLocal().getPort()).isNotNull();
+        assertThat(bugTrackerAppStatus.getLocal().getPort() > -1).isTrue();
+        assertThat(bugTrackerAppStatus.getRemote().getPort()).isNull();
     }
 }

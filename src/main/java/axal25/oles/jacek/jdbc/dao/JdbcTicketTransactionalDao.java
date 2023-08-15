@@ -1,5 +1,6 @@
 package axal25.oles.jacek.jdbc.dao;
 
+import axal25.oles.jacek.entity.ApplicationEntity;
 import axal25.oles.jacek.entity.TicketEntity;
 import org.apache.logging.log4j.LogManager;
 import org.hibernate.Session;
@@ -11,6 +12,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -21,6 +23,25 @@ public class JdbcTicketTransactionalDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+    public List<TicketEntity> selectTicketsTransactional() {
+        try (Session session = entityManager.unwrap(Session.class)) {
+            return session.doReturningWork(this::selectTickets);
+        }
+    }
+
+    private List<TicketEntity> selectTickets(Connection connection) throws SQLException {
+        try {
+            return JdbcTicketDao.selectTickets(connection);
+        } catch (SQLException e) {
+            connection.rollback();
+            throw new JdbcDaoRuntimeException(
+                    "Could not select " +
+                            ApplicationEntity.class.getSimpleName() +
+                            "s.",
+                    e);
+        }
+    }
+
 
     public TicketEntity insertTicketTransactional(TicketEntity ticket) {
         try (Session session = entityManager.unwrap(Session.class)) {
@@ -29,7 +50,7 @@ public class JdbcTicketTransactionalDao {
         }
     }
 
-    public TicketEntity insertTicketTransactional(TicketEntity ticket, Connection connection) throws SQLException {
+    private TicketEntity insertTicketTransactional(TicketEntity ticket, Connection connection) throws SQLException {
         Optional<TicketEntity> optTicket;
 
         try {
@@ -58,10 +79,10 @@ public class JdbcTicketTransactionalDao {
 
         connection.commit();
 
-        slf4jLogger.error("inserted {}: {}",
+        slf4jLogger.debug("inserted {}: {}",
                 TicketEntity.class.getSimpleName(),
                 optTicket.get().toJsonPrettyString());
-        log4jLogger.error("inserted {}: {}",
+        log4jLogger.debug("inserted {}: {}",
                 TicketEntity.class.getSimpleName(),
                 optTicket.get().toJsonPrettyString());
 

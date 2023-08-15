@@ -1,7 +1,6 @@
 package axal25.oles.jacek.jdbc.dao;
 
 import axal25.oles.jacek.entity.TicketEntity;
-import axal25.oles.jacek.entity.factory.EntityFactory;
 import axal25.oles.jacek.entity.factory.TicketEntityFactory;
 import axal25.oles.jacek.jdbc.DatabaseUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -14,10 +13,12 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+import static axal25.oles.jacek.entity.factory.EntityFactory.IdGenerateMode.FROM_JDBC;
 import static com.google.common.truth.Truth.assertThat;
 
 @SpringBootTest
 public class JdbcTicketDaoTest {
+    // TODO: rework
     private Connection connection;
 
     @BeforeEach
@@ -38,7 +39,7 @@ public class JdbcTicketDaoTest {
                 null,
                 null,
                 null,
-                EntityFactory.IdGenerateMode.FROM_JDBC);
+                FROM_JDBC);
 
         insertTicketAndAssert(inputTicket);
     }
@@ -51,7 +52,7 @@ public class JdbcTicketDaoTest {
                 null,
                 null,
                 null,
-                EntityFactory.IdGenerateMode.FROM_JDBC);
+                FROM_JDBC);
 
         insertTicketAndAssert(inputTicket);
 
@@ -68,7 +69,7 @@ public class JdbcTicketDaoTest {
                 null,
                 null,
                 null,
-                EntityFactory.IdGenerateMode.FROM_JDBC);
+                FROM_JDBC);
 
         insertTicketAndAssert(inputTicket);
 

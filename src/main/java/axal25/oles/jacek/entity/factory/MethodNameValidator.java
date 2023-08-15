@@ -14,7 +14,11 @@ public class MethodNameValidator {
                 .collect(Collectors.toList());
 
         if (matchingMethodNames.isEmpty()) {
-            throw new IllegalArgumentException("No matching method name found");
+            throw new IllegalArgumentException("No matching method name found for: \"" +
+                    expectedMethodName +
+                    "\" in class: " +
+                    methodOwnerClass.getSimpleName() +
+                    ".");
         }
 
         if (matchingMethodNames.size() > 1) {

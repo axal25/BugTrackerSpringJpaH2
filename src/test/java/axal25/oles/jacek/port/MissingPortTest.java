@@ -1,6 +1,7 @@
 package axal25.oles.jacek.port;
 
-import axal25.oles.jacek.config.AppInfoListener;
+import axal25.oles.jacek.context.info.BugTrackerAppStatusProducerOnApplicationReady;
+import axal25.oles.jacek.model.BugTrackerAppStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +15,15 @@ import static com.google.common.truth.Truth.assertThat;
 public class MissingPortTest {
 
     @Autowired
-    private AppInfoListener appInfoListener;
+    private BugTrackerAppStatusProducerOnApplicationReady bugTrackerAppStatusProducerOnApplicationReady;
 
     @Test
     void isPortNull() {
         // if the server.port=VALUE is missing from application.properties
-        assertThat(appInfoListener.getPort()).isNull();
-        assertThat(appInfoListener.getLocal().getPort()).isNull();
-        assertThat(appInfoListener.getRemote().getPort()).isNull();
+        BugTrackerAppStatus bugTrackerAppStatus =
+                bugTrackerAppStatusProducerOnApplicationReady.getBugTrackerAppStatusProducer().getBugTrackerAppStatus();
+        assertThat(bugTrackerAppStatus.getServerDotPort()).isNull();
+        assertThat(bugTrackerAppStatus.getLocal().getPort()).isNull();
+        assertThat(bugTrackerAppStatus.getRemote().getPort()).isNull();
     }
 }

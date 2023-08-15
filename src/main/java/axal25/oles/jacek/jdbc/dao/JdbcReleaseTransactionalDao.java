@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -20,6 +21,25 @@ public class JdbcReleaseTransactionalDao {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    public List<ReleaseEntity> selectReleasesTransactional() {
+        try (Session session = entityManager.unwrap(Session.class)) {
+            return session.doReturningWork(this::selectReleases);
+        }
+    }
+
+    private List<ReleaseEntity> selectReleases(Connection connection) throws SQLException {
+        try {
+            return JdbcReleaseDao.selectReleases(connection);
+        } catch (SQLException e) {
+            connection.rollback();
+            throw new JdbcDaoRuntimeException(
+                    "Could not select " +
+                            ReleaseEntity.class.getSimpleName() +
+                            "s.",
+                    e);
+        }
+    }
 
     public ReleaseEntity insertReleaseTransactional(ReleaseEntity release) {
         try (Session session = entityManager.unwrap(Session.class)) {
@@ -57,10 +77,10 @@ public class JdbcReleaseTransactionalDao {
 
         connection.commit();
 
-        slf4jLogger.error("inserted {}: {}",
+        slf4jLogger.debug("inserted {}: {}",
                 ReleaseEntity.class.getSimpleName(),
                 release.toJsonPrettyString());
-        log4jLogger.error("inserted {}: {}",
+        log4jLogger.debug("inserted {}: {}",
                 ReleaseEntity.class.getSimpleName(),
                 release.toJsonPrettyString());
 

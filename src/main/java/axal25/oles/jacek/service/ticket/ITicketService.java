@@ -7,6 +7,8 @@ import java.util.List;
 public interface ITicketService {
     List<TicketEntity> getAllTickets();
 
+    List<TicketEntity> getAllTicketsEagerly();
+
     TicketEntity getTicketById(int ticketId);
 
     void addTicket(TicketEntity ticket);

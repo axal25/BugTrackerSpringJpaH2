@@ -1,5 +1,6 @@
 package axal25.oles.jacek.entity.factory;
 
+import axal25.oles.jacek.dao.application.DaoApplicationEntityIdProvider;
 import axal25.oles.jacek.entity.ApplicationEntity;
 import axal25.oles.jacek.jdbc.id.provider.JdbcApplicationEntityIdProvider;
 
@@ -16,36 +17,38 @@ public class ApplicationEntityFactory implements EntityFactory<Integer> {
     public static ApplicationEntity produce(
             String expectedMethodName,
             Class<?> methodOwnerClass,
-            @Nullable Integer applicationId,
+            @Nullable Integer id,
             EntityFactory.IdGenerateMode idGenerateMode) {
 
         String methodName = MethodNameValidator
                 .getValidatedMethodName(expectedMethodName, methodOwnerClass);
 
-        if (applicationId == null) {
-            applicationId = factory.getId(applicationId, idGenerateMode);
+        if (id == null) {
+            id = factory.getId(id, idGenerateMode);
         }
 
+        Integer idForNonIdFields = factory.getIdForNonIdFields(id, idGenerateMode);
+
         ApplicationEntity application = new ApplicationEntity();
-        application.setId(applicationId);
+        application.setId(id);
         application.setName(
                 FieldValueFormatter.getStringValue(
                         ApplicationEntity.class,
                         "name",
                         methodName,
-                        application.getId()));
+                        idForNonIdFields));
         application.setDescription(
                 FieldValueFormatter.getStringValue(
                         ApplicationEntity.class,
                         "description",
                         methodName,
-                        application.getId()));
+                        idForNonIdFields));
         application.setOwner(
                 FieldValueFormatter.getStringValue(
                         ApplicationEntity.class,
                         "owner",
                         methodName,
-                        application.getId()));
+                        idForNonIdFields));
 
         return application;
     }
@@ -53,6 +56,11 @@ public class ApplicationEntityFactory implements EntityFactory<Integer> {
     @Override
     public Integer getIdFromJdbc() {
         return JdbcApplicationEntityIdProvider.generateId();
+    }
+
+    @Override
+    public Integer getIdFromEntityManager() {
+        return DaoApplicationEntityIdProvider.generateId();
     }
 
     @Override

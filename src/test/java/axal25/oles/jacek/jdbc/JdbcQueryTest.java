@@ -33,7 +33,7 @@ public class JdbcQueryTest {
     }
 
     @Test
-    void doesTableApplicationsExist1() throws Exception {
+    void doesTableApplicationsExist_usingInformationSchema() throws Exception {
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT count(*) "
                 + "FROM information_schema.tables "
                 + "WHERE table_name = ?"
@@ -46,7 +46,7 @@ public class JdbcQueryTest {
     }
 
     @Test
-    void doesTableApplicationsExist2() throws Exception {
+    void doesTableApplicationsExist_usingDatabaseMetaData() throws Exception {
         String applicationsTableName = Constants.Tables.APPLICATIONS.toUpperCase();
         ResultSet resultSet = DatabaseMetaDataUtils.getTables(
                 connection,

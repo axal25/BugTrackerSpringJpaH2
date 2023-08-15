@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 
 @Repository
 @Transactional
-public class DaoTestHelper {
+public class TestHelperDao {
 
     @PersistenceContext
     private EntityManager entityManager;

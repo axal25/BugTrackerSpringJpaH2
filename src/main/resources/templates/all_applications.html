@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en-US" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>Bug Tracker - All Applications</title>
+</head>
+<body>
+<div id="content">
+    <h1>Bug Tracker</h1>
+    <h3>SpringBoot + H2 DataBase</h3>
+    <h5>All Applications</h5>
+    <div>
+        <table>
+            <tr>
+                <td>ID</td>
+                <td>Name</td>
+                <td>Description</td>
+                <td>Owner</td>
+            </tr>
+            <tr th:each="app : ${allApplications}">
+                <td th:text="${app.id}">ID</td>
+                <td th:text="${app.name}">Name</td>
+                <td th:text="${app.description}">Description</td>
+                <td th:text="${app.owner}">Owner</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div id="menu">
+    <div id="menu-items">
+        <a class="menu-item" th:each="descToEndpoint : ${descriptionToEndpointMap}"
+           th:href="@{${descToEndpoint.value}}">
+            <span th:text="${descToEndpoint.key}">Description</span>
+            <strong th:text="${descToEndpoint.value}">Endpoint</strong>
+        </a>
+    </div>
+</div>
+<!--<div id="menu">-->
+<!--    <div id="menu-items">-->
+<!--        <a class="menu-item" href="http://localhost:8080/bug-tracker/web/application">-->
+<!--            <span> Applications Web </span>-->
+<!--        </a>-->
+<!--        <a class="menu-item" href="http://localhost:8080/console">-->
+<!--            <span> H2 DB Console </span>-->
+<!--            http://localhost:8080/console-->
+<!--        </a>-->
+<!--        <a class="menu-item" href="http://localhost:8080/bug-tracker/status">-->
+<!--            <span> Bug Tracker Application (API)-->
+<!--            status </span>-->
+<!--            http://localhost:8080/bug-tracker/status-->
+<!--        </a>-->
+<!--        <a class="menu-item" href="http://localhost:8080/bug-tracker/application">-->
+<!--            <span> Applications endpoints </span>-->
+<!--            http://localhost:8080/bug-tracker/application-->
+<!--        </a>-->
+<!--        <a class="menu-item" href="http://localhost:8080/bug-tracker/release">-->
+<!--            <span> Releases endpoints </span>-->
+<!--            http://localhost:8080/bug-tracker/release-->
+<!--        </a>-->
+<!--        <a class="menu-item" href="http://localhost:8080/bug-tracker/ticket">-->
+<!--            <span> Tickets endpoints </span>-->
+<!--            http://localhost:8080/bug-tracker/ticket-->
+<!--        </a>-->
+<!--    </div>-->
+<!--</div>-->
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>

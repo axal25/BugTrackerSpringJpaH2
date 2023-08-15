@@ -23,6 +23,11 @@ public class TicketService implements ITicketService {
     }
 
     @Override
+    public List<TicketEntity> getAllTicketsEagerly() {
+        return ticketDao.getAllTicketsEagerly();
+    }
+
+    @Override
     public TicketEntity getTicketById(int ticketId) {
         return ticketDao.getTicketById(ticketId);
     }

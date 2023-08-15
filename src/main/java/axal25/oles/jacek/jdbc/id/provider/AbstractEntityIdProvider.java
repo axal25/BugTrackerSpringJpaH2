@@ -8,11 +8,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public abstract class JdbcAbstractEntityIdProvider {
+public abstract class AbstractEntityIdProvider {
 
     private final Set<Integer> handedOut = new HashSet<>();
 
-    protected JdbcAbstractEntityIdProvider() {
+    protected AbstractEntityIdProvider() {
     }
 
     protected synchronized int instanceGenerateId() {

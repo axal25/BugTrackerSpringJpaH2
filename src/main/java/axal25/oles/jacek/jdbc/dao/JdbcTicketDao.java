@@ -7,10 +7,7 @@ import axal25.oles.jacek.entity.TicketEntity;
 import axal25.oles.jacek.json.JsonObject;
 import axal25.oles.jacek.util.CollectionUtils;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,7 +34,11 @@ public class JdbcTicketDao {
         preparedStatement.setString(2, ticket.getTitle());
         preparedStatement.setString(3, ticket.getStatus());
         preparedStatement.setString(4, ticket.getDescription());
-        preparedStatement.setInt(5, ticket.getApplication().getId());
+        if (ticket.getApplication() != null) {
+            preparedStatement.setInt(5, ticket.getApplication().getId());
+        } else {
+            preparedStatement.setNull(5, Types.INTEGER);
+        }
 
         if (preparedStatement.executeUpdate() != 1) {
             return Optional.empty();
@@ -211,7 +212,7 @@ public class JdbcTicketDao {
                         "Found " +
                         ApplicationEntity.class.getSimpleName() +
                         "s: " +
-                        CollectionUtils.lengthyElementsToString(applications.stream()
+                        CollectionUtils.lengthyStringsToString(applications.stream()
                                 .map(JsonObject::toJsonPrettyString)
                                 .collect(Collectors.toList()))));
     }
@@ -261,7 +262,7 @@ public class JdbcTicketDao {
                         ".\r\nFound " +
                         ReleaseEntity.class.getSimpleName() +
                         "s: " +
-                        CollectionUtils.lengthyElementsToString(releases.stream()
+                        CollectionUtils.lengthyStringsToString(releases.stream()
                                 .map(JsonObject::toJsonPrettyString)
                                 .collect(Collectors.toList()))));
     }

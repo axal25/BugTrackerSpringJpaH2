@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.List;
+
 import static axal25.oles.jacek.constant.Constants.EndpointPaths.RELEASE_CONTROLLER;
 
 @RestController
@@ -17,6 +19,13 @@ public class ReleaseController {
 
     @Autowired
     private IReleaseService releaseService;
+
+    @GetMapping("")
+    public ResponseEntity<List<ReleaseEntity>> getAllReleases() {
+        return new ResponseEntity<>(
+                releaseService.getAllReleases(),
+                HttpStatus.OK);
+    }
 
     @PostMapping("")
     public ResponseEntity<ReleaseEntity> addRelease(

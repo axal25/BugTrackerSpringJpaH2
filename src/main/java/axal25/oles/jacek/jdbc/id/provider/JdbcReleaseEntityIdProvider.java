@@ -6,7 +6,7 @@ import axal25.oles.jacek.jdbc.dao.JdbcReleaseDao;
 import java.sql.SQLException;
 import java.util.Set;
 
-public class JdbcReleaseEntityIdProvider extends JdbcAbstractEntityIdProvider {
+public class JdbcReleaseEntityIdProvider extends AbstractEntityIdProvider {
 
     private static JdbcReleaseEntityIdProvider singleton = null;
 

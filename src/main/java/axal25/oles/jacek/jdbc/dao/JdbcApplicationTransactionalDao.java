@@ -1,5 +1,6 @@
 package axal25.oles.jacek.jdbc.dao;
 
+import axal25.oles.jacek.constant.Constants;
 import axal25.oles.jacek.entity.ApplicationEntity;
 import org.apache.logging.log4j.LogManager;
 import org.hibernate.Session;
@@ -21,14 +22,51 @@ public class JdbcApplicationTransactionalDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public ApplicationEntity insertApplicationTransactional(ApplicationEntity application) {
+    public ApplicationEntity selectApplicationByIdTransactional(Integer id) {
         try (Session session = entityManager.unwrap(Session.class)) {
-            return session.doReturningWork((connection) ->
-                    insertApplicationTransactional(application, connection));
+            return session.doReturningWork((connection) -> selectApplicationById(id, connection));
         }
     }
 
-    public ApplicationEntity insertApplicationTransactional(ApplicationEntity application, Connection connection) throws SQLException {
+    private ApplicationEntity selectApplicationById(Integer id, Connection connection) throws SQLException {
+        Optional<ApplicationEntity> optApp;
+
+        try {
+            optApp = JdbcApplicationDao.selectApplicationById(id, connection);
+        } catch (SQLException e) {
+            connection.rollback();
+            throw new JdbcDaoRuntimeException(
+                    "Could not select " +
+                            ApplicationEntity.class.getSimpleName() +
+                            " with " +
+                            Constants.Tables.Applications.ID +
+                            ": " +
+                            id +
+                            ".",
+                    e);
+        }
+
+        if (optApp.isEmpty()) {
+            connection.rollback();
+            throw new JdbcDaoRuntimeException("Returned " +
+                    Optional.class +
+                    "<" +
+                    ApplicationEntity.class.getSimpleName() +
+                    "> was " +
+                    Optional.empty() +
+                    ".");
+        }
+
+        return optApp.get();
+    }
+
+    public ApplicationEntity insertApplicationTransactional(ApplicationEntity inputApplication) {
+        try (Session session = entityManager.unwrap(Session.class)) {
+            return session.doReturningWork((connection) -> insertApplication(inputApplication, connection));
+        }
+    }
+
+    private ApplicationEntity insertApplication(ApplicationEntity application, Connection connection) throws SQLException {
         Optional<ApplicationEntity> optApp;
 
         try {
@@ -57,10 +95,10 @@ public class JdbcApplicationTransactionalDao {
 
         connection.commit();
 
-        slf4jLogger.error("inserted {}: {}",
+        slf4jLogger.debug("inserted {}: {}",
                 ApplicationEntity.class.getSimpleName(),
                 optApp.get().toJsonPrettyString());
-        log4jLogger.error("inserted {}: {}",
+        log4jLogger.debug("inserted {}: {}",
                 ApplicationEntity.class.getSimpleName(),
                 optApp.get().toJsonPrettyString());
 

@@ -53,7 +53,7 @@ public class JdbcApplicationToReleaseDao {
         return Optional.empty();
     }
 
-    public static Optional<SimpleEntry<Integer, Integer>> selectApplicationIdToReleaseIdByReleaseId(Integer releaseId, Connection connection) throws SQLException {
+    public static Map<Integer, Integer> selectApplicationIdToReleaseIdByReleaseId(Integer releaseId, Connection connection) throws SQLException {
         if (releaseId == null) {
             throw new SQLException(ReleaseEntity.class.getSimpleName() +
                     "'s " +
@@ -66,14 +66,13 @@ public class JdbcApplicationToReleaseDao {
         preparedStatement.setInt(1, releaseId);
         ResultSet resultSet = preparedStatement.executeQuery();
 
-        if (resultSet.next()) {
+        Map<Integer, Integer> applicationIdToReleaseIdMap = new HashMap<>();
+        while (resultSet.next()) {
             Integer fetchedApplicationId = resultSet.getInt(Constants.Tables.ApplicationsToReleases.APPLICATION_ID);
             Integer fetchedReleaseId = resultSet.getInt(Constants.Tables.ApplicationsToReleases.RELEASE_ID);
-
-            return Optional.of(new SimpleEntry<>(fetchedApplicationId, fetchedReleaseId));
+            applicationIdToReleaseIdMap.put(fetchedApplicationId, fetchedReleaseId);
         }
-
-        return Optional.empty();
+        return applicationIdToReleaseIdMap;
     }
 
     public static Map<Integer, Integer> selectApplicationIdToReleaseIdMapByApplicationIds(List<Integer> applicationIds, Connection connection) throws SQLException {

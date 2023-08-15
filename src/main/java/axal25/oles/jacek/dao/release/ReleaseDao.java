@@ -21,6 +21,22 @@ public class ReleaseDao implements IReleaseDao {
     @Autowired
     private IApplicationDao applicationDao;
 
+    @Override
+    public List<ReleaseEntity> getAllReleases() {
+        String jpqlQuery = "SELECT release from " +
+                ReleaseEntity.class.getSimpleName() +
+                " release ORDER BY release.id";
+        return entityManager.createQuery(jpqlQuery, ReleaseEntity.class).getResultList();
+    }
+
+    @Override
+    public List<ReleaseEntity> getAllReleasesEagerly() {
+        String jpqlQuery = "SELECT DISTINCT release from " +
+                ReleaseEntity.class.getSimpleName() +
+                " release LEFT JOIN FETCH release.applications apps" +
+                " ORDER BY release.id";
+        return entityManager.createQuery(jpqlQuery, ReleaseEntity.class).getResultList();
+    }
 
     @Override
     public void addRelease(ReleaseEntity release) {
@@ -39,13 +55,5 @@ public class ReleaseDao implements IReleaseDao {
     @Override
     public ReleaseEntity getReleaseById(int releaseId) {
         return entityManager.find(ReleaseEntity.class, releaseId);
-    }
-
-    @Override
-    public List<ReleaseEntity> getAllReleases() {
-        String jpqlQuery = "SELECT release from " +
-                ReleaseEntity.class.getSimpleName() +
-                " release ORDER BY release.id";
-        return entityManager.createQuery(jpqlQuery, ReleaseEntity.class).getResultList();
     }
 }
